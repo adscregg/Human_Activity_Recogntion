@@ -131,17 +131,17 @@ def _translation_scale_invariant(arr):
     return transformed
 
 def _create_action_array(d):
-        """
-        Parameters
-        -----------
-        d: dictionary, contains information about the skeleton sequence in the NTU RGB+D dataset
+    """
+    Parameters
+    -----------
+    d: dictionary, contains information about the skeleton sequence in the NTU RGB+D dataset
 
-        Returns
-        ---------
-        np.array, shape = (N, M, C)
-            array where the RGB channel represent the XYZ coordinates of the joints, each row corresponds to a single joint in all frames,
-            each column is all joints in a single frame
-        """
+    Returns
+    ---------
+    np.array, shape = (N, M, C)
+        array where the RGB channel represent the XYZ coordinates of the joints, each row corresponds to a single joint in all frames,
+        each column is all joints in a single frame
+    """
     order = list(range(25)) # the order of the joints in the image, reordered from default to cature local spatial characteristics
     action_array = None # default value for action image
     for i in range(np.max(d['nbodys'])): # loop over the most number of bodies in that are present in the video sequence
