@@ -142,9 +142,26 @@ def _create_action_array(d):
         array where the RGB channel represent the XYZ coordinates of the joints, each row corresponds to a single joint in all frames,
         each column is all joints in a single frame
     """
+    # if 'S014C003P025R001A057' in d['file_name']:
+    #     for j in range(np.max(d['nbodys'])):
+    #         print([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)], sum([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)]))
+
     order = list(range(25)) # the order of the joints in the image, reordered from default to cature local spatial characteristics
+    #[5,6,7,8,22,23,9,10,11,12,24,25,1,2,21,3,4,17,18,19,20,13,14,15,16]
     action_array = None # default value for action image
-    for i in range(np.max(d['nbodys'])): # loop over the most number of bodies in that are present in the video sequence
+
+    nbodys = 1 if int(d['file_name'][17:21]) < 50 else 2
+    actual_bodys = min(np.max(d['nbodys']), nbodys)
+    vars = list()
+    for i in range(np.max(d['nbodys'])):
+        vars.append(np.sum([np.var(d['skel_body'+str(i)][:,:,c]) for c in range(3)]))
+
+    select = np.argsort(vars)[-actual_bodys:]
+
+
+
+
+    for i in select: # loop over the most number of bodies in that are present in the video sequence
         temp = d['skel_body'+str(i)][:,order,:] # get the ith skeleton and reorder the joints in the image
         if action_array is None: # check if the default value has been overwritten
             action_array = temp
@@ -191,4 +208,4 @@ if __name__ == '__main__':
         # if ind == 5:
         #     break
         # raise ValueError()
-    _end_toolbar()
+    # _end_toolbar()
