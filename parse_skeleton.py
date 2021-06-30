@@ -187,8 +187,8 @@ if __name__ == '__main__':
         S = int(each[1:4])
         if S not in step_ranges:
             continue
-        if each+'.skeleton.npy' in alread_exist_dict:
-            print('file already existed !')
+        if each[:20]+'.jpg' in alread_exist_dict:
+            print('file already existed!')
             continue
         if each[:20] in missing_files:
             print('file missing')
