@@ -120,12 +120,12 @@ def _translation_scale_invariant(arr):
     channels = arr.shape[-1] # The number of channels in the array, mostly 3 (RGB) or 1 (binary)
     mins = np.empty((1,1,3)) # create a placeholder array for shifting the coordinate values
     diffs = list() # empty list which will hold the variation between max and min of each channel
-    for i in range(channels):
-        channel = arr[:,:,i] # the ith channel
-        c_min = channel.min() # min value in ith channel
-        c_max = channel.max() # max value in ith channel
+    for c in range(channels):
+        channel = arr[:,:,c] # the c th channel
+        c_min = channel.min() # min value in c th channel
+        c_max = channel.max() # max value in c th channel
         diffs.append(c_max - c_min)
-        mins[:,:,i] = c_min # store the min value for the ith channel, to remove translation factor of the image
+        mins[:,:,c] = c_min # store the min value for the c th channel, to remove translation factor of the image
     max_diffs = np.max(diffs) # largest variation to remove the scale of the image
     transformed = np.floor(((arr - mins)/max_diffs) * 255).astype(np.uint8) # apply tranformation
     return transformed
@@ -142,21 +142,19 @@ def _create_action_array(d):
         array where the RGB channel represent the XYZ coordinates of the joints, each row corresponds to a single joint in all frames,
         each column is all joints in a single frame
     """
-    # if 'S014C003P025R001A057' in d['file_name']:
-    #     for j in range(np.max(d['nbodys'])):
-    #         print([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)], sum([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)]))
 
     order = [4,5,6,7,21,22,8,9,10,11,23,24,0,1,20,2,3,16,17,18,19,12,13,14,15] # the order of the joints in the image, reordered from default to cature local spatial characteristics
 
     action_array = None # default value for action image
 
-    nbodys = 1 if int(d['file_name'][17:21]) < 50 else 2
-    actual_bodys = min(np.max(d['nbodys']), nbodys)
-    vars = list()
-    for i in range(np.max(d['nbodys'])):
-        vars.append(np.sum([np.var(d['skel_body'+str(i)][:,:,c]) for c in range(3)]))
+    nbodys = 1 if int(d['file_name'][17:21]) < 50 else 2 # the number of bodys there should be in a sequence according to the action class
+    actual_bodys = min(np.max(d['nbodys']), nbodys) # the number of bodys to select for creating an action array
 
-    select = np.argsort(vars)[-actual_bodys:]
+    vars = list() # initialize empty list, will hold variance for each channel of potential bodys
+    for i in range(np.max(d['nbodys'])): # loop over all bodys present in a given sequence
+        vars.append(np.sum([np.var(d['skel_body'+str(i)][:,:,c]) for c in range(3)])) # sum the variances for all channels together, heuristic for how dynamic a body is during a sequence
+
+    select = np.argsort(vars)[-actual_bodys:] # select the largest variances and use them for the ceation of action array
 
 
 
@@ -188,13 +186,12 @@ if __name__ == '__main__':
         if S not in step_ranges:
             continue
         if each[:20]+'.jpg' in alread_exist_dict:
-            print('file already existed!')
+            # print('file already existed!')
             continue
         if each[:20] in missing_files:
-            print('file missing')
+            print(f'{each[:20]} file missing')
             continue
         loadname = load_txt_path+each
-        # print(each)
         mat = _read_skeleton(loadname)
         arr = np.array(mat).item(0)
 
