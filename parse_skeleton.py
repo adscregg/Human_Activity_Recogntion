@@ -146,8 +146,8 @@ def _create_action_array(d):
     #     for j in range(np.max(d['nbodys'])):
     #         print([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)], sum([np.var(d['skel_body'+str(j)][:,:,i]) for i in range(3)]))
 
-    order = list(range(25)) # the order of the joints in the image, reordered from default to cature local spatial characteristics
-    #[5,6,7,8,22,23,9,10,11,12,24,25,1,2,21,3,4,17,18,19,20,13,14,15,16]
+    order = [4,5,6,7,21,22,8,9,10,11,23,24,0,1,20,2,3,16,17,18,19,12,13,14,15] # the order of the joints in the image, reordered from default to cature local spatial characteristics
+
     action_array = None # default value for action image
 
     nbodys = 1 if int(d['file_name'][17:21]) < 50 else 2
