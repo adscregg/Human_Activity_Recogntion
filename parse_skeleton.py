@@ -177,6 +177,7 @@ if __name__ == '__main__':
     alread_exist = os.listdir(save_npy_path)
     alread_exist_dict = dict(zip(alread_exist, len(alread_exist) * [True]))
 
+    
     for each in tqdm(datalist):
         # _print_toolbar(ind * 1.0 / len(datalist),
         #                '({:>5}/{:<5})'.format(

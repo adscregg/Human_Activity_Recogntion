@@ -9,6 +9,8 @@ from tqdm import tqdm
 
 def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100,100), med = (64,64), small = (40,40)):
     """
+    Calculates the pooled and flattened scattering coefficients for all images in a directory
+
     Parameters
     -----------
     image_dir: string
