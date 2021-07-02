@@ -85,14 +85,18 @@ class runModel:
             self.train_loss_history.append(epoch_loss / self.num_train_samples) # average loss for all samples in the epoch
             self.train_acc_history.append(n_correct / self.num_train_samples) # accuracy score, between 0 and 1
 
-            if self.scheduler is not None:
-                self.scheduler.step() # update the scheduler
+
+            if self.scheduler is not None and not validate:
+                self.scheduler.step(self.train_loss) # update the scheduler
 
             if validate:
                 self.test() # run the test loop
                 # append the metrics on the test set
                 self.test_loss_history.append(self.test_loss)
                 self.test_acc_history.append(self.test_accuracy)
+
+                if self.scheduler is not None:
+                    self.scheduler.step(self.test_loss) # update the scheduler
 
     def test(self):
         """
