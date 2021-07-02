@@ -67,7 +67,8 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
 
     Pool = nn.AdaptiveAvgPool2d(1) # global average pooling
 
-    for i, file in tqdm(enumerate(files)): # loop over each file in the directory
+    i = 0 # dummy counter variable
+    for file in tqdm(files): # loop over each file in the directory
         path = os.path.join(image_dir, file) # path to the image itself
         image = Image.open(path).convert("RGB") # read in the image and convert to RGB to ensure 3 channels
 
@@ -106,6 +107,8 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
             stack_large = torch.Tensor()
             stack_med = torch.Tensor()
             stack_small = torch.Tensor()
+
+        i += 1
 
     return scattering_dict
 

@@ -57,13 +57,13 @@ class imageDataset(Dataset):
             list of integers containing the performer (subject) IDs to be used in the dataset
 
         large: tuple (N, M)
-            size to reshape image to
+            size to reshape image to. Defaults to (100, 100)
 
-        med: tuple
-            see `large`
+        med: tuple (N, M)
+            see `large`. Defaults to (64, 64)
 
-        small: tuple
-            see `large`
+        small: tuple (N, M)
+            see `large`. Defaults to (40, 40)
 
         """
 

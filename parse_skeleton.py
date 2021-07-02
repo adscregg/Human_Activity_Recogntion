@@ -152,7 +152,7 @@ def _create_action_array(d):
 
     vars = list() # initialize empty list, will hold variance for each channel of potential bodys
     for i in range(np.max(d['nbodys'])): # loop over all bodys present in a given sequence
-        vars.append(np.sum([np.var(d['skel_body'+str(i)][:,:,c]) for c in range(3)])) # sum the variances for all channels together, heuristic for how dynamic a body is during a sequence
+        vars.append(np.sum([np.var(d[f'skel_body{i}'][:,:,c]) for c in range(3)])) # sum the variances for all channels together, heuristic for how dynamic a body is during a sequence
 
     select = np.argsort(vars)[-actual_bodys:] # select the largest variances and use them for the ceation of action array
 
@@ -160,7 +160,7 @@ def _create_action_array(d):
 
 
     for i in select: # loop over the most number of bodies in that are present in the video sequence
-        temp = d['skel_body'+str(i)][:,order,:] # get the ith skeleton and reorder the joints in the image
+        temp = d[f'skel_body{i}'][:,order,:] # get the ith skeleton and reorder the joints in the image
         if action_array is None: # check if the default value has been overwritten
             action_array = temp
         else:
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     alread_exist = os.listdir(save_npy_path)
     alread_exist_dict = dict(zip(alread_exist, len(alread_exist) * [True]))
 
-    
+
     for each in tqdm(datalist):
         # _print_toolbar(ind * 1.0 / len(datalist),
         #                '({:>5}/{:<5})'.format(
