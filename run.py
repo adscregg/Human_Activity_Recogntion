@@ -56,7 +56,7 @@ class runModel:
 
         self.lr_history = None
         self.average_time_per_epoch = None
-        self.num_eopchs = None
+        self.num_epochs = None
 
     def train(self, epochs, validate = False):
         """
@@ -197,6 +197,7 @@ class runModel:
 
         self.model_summary = {
         'name': name,
+        'num parameters': self.n_parameters,
 
         'num train samples': self.num_train_samples,
         'num test samples': self.num_test_samples,
