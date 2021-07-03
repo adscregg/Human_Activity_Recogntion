@@ -1,4 +1,5 @@
-from torch.nn import Module, Linear, ReLU
+from torch.nn import Module, Linear, ReLU, Sequential
+import torch
 
 
 class MultiScalePretrained(Module):
@@ -68,9 +69,9 @@ class ScatteringModel(Module):
         super().__init__()
 
         if hidden_units is None: # if no hidden units passed, a linear classifier is assumed
-            self.classifier_large = nn.Sequential(Linear(input_size, n_classes))
-            self.classifier_med = nn.Sequential(Linear(input_size, n_classes))
-            self.classifier_small = nn.Sequential(Linear(input_size, n_classes))
+            self.classifier_large = Sequential(Linear(input_size, n_classes))
+            self.classifier_med = Sequential(Linear(input_size, n_classes))
+            self.classifier_small = Sequential(Linear(input_size, n_classes))
 
         else:
             # lists to hold the layer and activation objects to be unpacked into a sequential object
@@ -91,10 +92,10 @@ class ScatteringModel(Module):
             c_med.append(Linear(input_size, n_classes))
             c_small.append(Linear(input_size, n_classes))
 
-            # unpack the lists to create the nn.Sequential objects that data can be passed through
-            self.classifier_large = nn.Sequential(*c_large)
-            self.classifier_med = nn.Sequential(*c_med)
-            self.classifier_small = nn.Sequential(*c_small)
+            # unpack the lists to create the Sequential objects that data can be passed through
+            self.classifier_large = Sequential(*c_large)
+            self.classifier_med = Sequential(*c_med)
+            self.classifier_small = Sequential(*c_small)
 
     def forward(self, large, med, small):
 
