@@ -42,6 +42,7 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
 
     """
     files = set(os.listdir(image_dir)).difference({'Thumbs.db'}) # create a set of files, removing the unwanted Thumbs.db file if present
+    # save_dir = './data/NTU_RGB+D/scattering_coeffs/'
 
 
     # Scattering network initialisation and moving to GPU
@@ -101,6 +102,7 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
             for j, name in enumerate(in_stack):
                 # target value has -1 so the classes start at 0 rather than 1, better for pytorch networks to handle
                 scattering_dict[in_stack[j]] = (coeffs_large[j], coeffs_med[j], coeffs_small[j], int(name[-3:])-1) # add the flattend coeffs and target to the dictionary with the key as the file name without the extension
+                # torch.save((coeffs_large[j].type(torch.float64), coeffs_med[j].type(torch.float64), coeffs_small[j].type(torch.float64), int(name[-3:])-1), save_dir + name + '.pth')
 
             # reset the stacks and lists
             in_stack = list()
