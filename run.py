@@ -1,4 +1,6 @@
 import torch
+import inspect
+from tqdm import tqdm
 
 class runModel:
     def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None):
@@ -50,18 +52,20 @@ class runModel:
             Number of loops over the dataset
 
         validate: bool
-            Whether to evaluate the model on the test set throughout the training process
+            Whether to evaluate the model on the test set throughout the training process. If `True`, the scheduler, if given, will be called using
+            metrics from the validation pass
         """
         # initialise lists to track the metrics on the training set throughout training
         self.train_loss_history = list()
         self.train_acc_history = list()
+        self.lr_history = list()
 
         # if validate is set to True, track the metrics on the test set throughout training
         if validate:
             self.test_loss_history = list()
             self.test_acc_history = list()
-
-        for _ in range(epochs):
+        progress = tqdm(range(epochs))
+        for epoch in progress:
             self.model.train() # put the model into train mode, includes layers, e.g. Dropout, that are only used for training
             epoch_loss = 0 # reset the stats for each epoch
             n_correct = 0
@@ -77,26 +81,42 @@ class runModel:
 
                 epoch_loss += loss.item()*target.size(0) # loss is the average for all sample in the batch, total loss is avg*batch_size
                 pred = torch.argmax(output, dim = 1) # make the prediction by taking the largest output value for each sample
-                n_correct += (pred == target).float().sum() # calculate how many are correct
+                n_correct += (pred == target).float().sum().item() # calculate how many are correct
 
                 loss.backward() # backward pass through the model, or backpropagation
                 self.optimiser.step() # update the weights
 
-            self.train_loss_history.append(epoch_loss / self.num_train_samples) # average loss for all samples in the epoch
-            self.train_acc_history.append(n_correct / self.num_train_samples) # accuracy score, between 0 and 1
+            self.train_loss = epoch_loss / self.num_train_samples
+            self.train_accuracy = n_correct / self.num_train_samples
+
+            self.train_loss_history.append(self.train_loss) # average loss for all samples in the epoch
+            self.train_acc_history.append(self.train_accuracy) # accuracy score, between 0 and 1
 
 
             if self.scheduler is not None and not validate:
-                self.scheduler.step(self.train_loss) # update the scheduler
+                if 'metrics' in inspect.getfullargspec(self.scheduler.step)[0]:
+                    self.scheduler.step(self.train_loss_history[-1]) # update the scheduler
+                else:
+                    self.scheduler.step(epoch + 1)
 
             if validate:
                 self.test() # run the test loop
+
                 # append the metrics on the test set
                 self.test_loss_history.append(self.test_loss)
                 self.test_acc_history.append(self.test_accuracy)
 
-                if self.scheduler is not None:
+                progress.set_postfix(train_accuracy = self.train_accuracy, train_loss = self.train_loss, test_acc = self.test_accuracy, test_loss = self.test_loss) # update progress bar outputs
+
+                if 'metrics' in inspect.getfullargspec(self.scheduler.step)[0]:
                     self.scheduler.step(self.test_loss) # update the scheduler
+                else:
+                    self.scheduler.step(epoch + 1)
+
+            else:
+                progress.set_postfix(train_accuracy = self.train_accuracy, train_loss = self.train_loss)
+
+            self.lr_history.append(self.optimiser.param_groups[0]['lr'])
 
     def test(self):
         """
@@ -119,7 +139,7 @@ class runModel:
 
                 self.test_loss += loss.item()*target.size(0)
                 pred = torch.argmax(output, dim = 1)
-                n_correct += (pred == target).float().sum()
+                n_correct += (pred == target).float().sum().item()
 
             self.test_loss /= self.num_test_samples
             self.test_accuracy = n_correct / self.num_test_samples
