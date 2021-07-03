@@ -33,7 +33,7 @@ class scatteringDataset(Dataset):
         self.samples = [] # empty list, will contain samples to be accepted into the dataset
 
         for k, v in self.scattering_dict.items(): # loop over the key, value pairs
-            if k in self.subjects: # check if the subject id is in the list that are being accepted
+            if k[8:12] in self.subjects: # check if the subject id is in the list that are being accepted
                 self.samples.append(v) # add sample to accepted samples of the dataset
 
     def __len__(self):
@@ -98,7 +98,7 @@ class imageDataset(Dataset):
     def __getitem__(self, idx):
         file_name = self.accepted_files[idx]
         file_path = os.path.join(self.image_dir, file_name) # full path to image
-        image = PIL.Image.open(file_path).convert("RGB") # open image and convert to RGB to ensure 3 channels
+        image = Image.open(file_path).convert("RGB") # open image and convert to RGB to ensure 3 channels
 
         # Apply transformations to the images
         im_large = self.trans_large(image)
