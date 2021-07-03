@@ -1,6 +1,7 @@
 import torch
 import inspect
 from tqdm import tqdm
+from time import time
 
 class runModel:
     def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None):
@@ -59,6 +60,7 @@ class runModel:
         self.train_loss_history = list()
         self.train_acc_history = list()
         self.lr_history = list()
+        self._epoch_times = list()
 
         # if validate is set to True, track the metrics on the test set throughout training
         if validate:
@@ -69,6 +71,7 @@ class runModel:
             self.model.train() # put the model into train mode, includes layers, e.g. Dropout, that are only used for training
             epoch_loss = 0 # reset the stats for each epoch
             n_correct = 0
+            start = time()
 
             for large, med, small, target in self.train_loader:
                 # load samples and targets onto the specified device (cpu or gpu)
@@ -85,6 +88,9 @@ class runModel:
 
                 loss.backward() # backward pass through the model, or backpropagation
                 self.optimiser.step() # update the weights
+
+            epoch_time = time() - start
+            self._epoch_times.append(epoch_time)
 
             self.train_loss = epoch_loss / self.num_train_samples
             self.train_accuracy = n_correct / self.num_train_samples
@@ -117,6 +123,8 @@ class runModel:
                 progress.set_postfix(train_accuracy = self.train_accuracy, train_loss = self.train_loss)
 
             self.lr_history.append(self.optimiser.param_groups[0]['lr'])
+
+        self.average_time_per_epoch = sum(self._epoch_times)/len(self._epoch_times)
 
     def test(self):
         """
