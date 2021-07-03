@@ -2,6 +2,7 @@ import torch
 import inspect
 from tqdm import tqdm
 from time import time
+import json
 
 class runModel:
     def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None):
@@ -43,6 +44,20 @@ class runModel:
         self.num_test_samples = len(self.test_loader.dataset)
         self.num_train_samples = len(self.train_loader.dataset)
 
+        self.train_accuracy = None
+        self.test_accuracy = None
+        self.train_acc_history = None
+        self.test_acc_history = None
+
+        self.train_loss = None
+        self.test_loss = None
+        self.train_loss_history = None
+        self.test_loss_history = None
+
+        self.lr_history = None
+        self.average_time_per_epoch = None
+        self.num_eopchs = None
+
     def train(self, epochs, validate = False):
         """
         Train the model
@@ -61,6 +76,7 @@ class runModel:
         self.train_acc_history = list()
         self.lr_history = list()
         self._epoch_times = list()
+        self.num_epochs = epochs
 
         # if validate is set to True, track the metrics on the test set throughout training
         if validate:
@@ -175,3 +191,31 @@ class runModel:
         """
         self.model.load_state_dict(torch.load(file_path))
         self.model.eval() # default to evaluation mode after loading the weights
+
+
+    def create_model_summary(self, name):
+
+        self.model_summary = {
+        'name': name,
+
+        'num train samples': self.num_train_samples,
+        'num test samples': self.num_test_samples,
+        'num epochs': self.num_epochs,
+
+        'train accuracy': self.train_accuracy,
+        'train loss': self.train_loss,
+        'test accuracy': self.test_accuracy,
+        'test loss': self.test_loss,
+
+        'train accuracy history': self.train_acc_history,
+        'train loss history': self.train_loss_history,
+        'test accuracy history': self.test_acc_history,
+        'test loss history': self.test_loss_history,
+
+        'lr history': self.lr_history,
+        'avg time per epoch': self.average_time_per_epoch,
+        }
+
+    def save_model_summary(self, file_path):
+        with open(file_path, 'w') as fp:
+            json.dump(self.model_summary, fp, indent = 4)
