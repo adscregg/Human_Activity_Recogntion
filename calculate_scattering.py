@@ -7,7 +7,7 @@ from kymatio.torch import Scattering2D
 from tqdm import tqdm
 
 
-def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100,100), med = (64,64), small = (40,40)):
+def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, large = (100,100), med = (64,64), small = (40,40)):
     """
     Calculates the pooled and flattened scattering coefficients for all images in a directory
 
@@ -15,6 +15,9 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
     -----------
     image_dir: string
         File path to directory of images
+
+    save_dir: string
+        File path to save the calculated coefficients
 
     J: int
         Log-2 of the scattering scale
@@ -42,7 +45,6 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
 
     """
     files = set(os.listdir(image_dir)).difference({'Thumbs.db'}) # create a set of files, removing the unwanted Thumbs.db file if present
-    # save_dir = './data/NTU_RGB+D/scattering_coeffs/'
 
 
     # Scattering network initialisation and moving to GPU
@@ -118,5 +120,5 @@ def preprocessScatteringCoeffs(image_dir, J, L= 8, batch_size = 64, large = (100
 
 if __name__ == '__main__':
     image_dir = './data/NTU_RGB+D/transformed_images'
-    d = preprocessScatteringCoeffs(image_dir, J = 4, batch_size = 64)
-    print(d.keys())
+    save_dir = './data/NTU_RGB+D/scattering_coeffs/'
+    d = preprocessScatteringCoeffs(image_dir, save_dir, J = 4, batch_size = 64)
