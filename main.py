@@ -49,17 +49,17 @@ images_testloader = DataLoader(images_test, batch_size = BATCH_SIZE, shuffle = T
 print('Done')
 
 
-scattering_dict_J4_L8 = preprocessScatteringCoeffs(DATA_DIR, save_dir = None, J = 4, L = 8, batch_size = 64) # precalculate the flattened and pooled scattering coeffs
-# scattering_dir = './data/NTU_RGB+D/scattering_coeffs/'
+# scattering_dict_J4_L8 = preprocessScatteringCoeffs(DATA_DIR, save_dir = None, J = 4, L = 8, batch_size = 64) # precalculate the flattened and pooled scattering coeffs
+scattering_dir = './data/NTU_RGB+D/scattering_coeffs/'
 in_size_J4_L8 = input_size(4, 8)
 
 print('Creating scattering datasets...')
 # create the scattering datasets with varying test sample sizes
-scattering_train_5_subs = scatteringDataset(scattering_dict_J4_L8, TRAIN_SUBJECT_IDS[:5])
-scattering_train_10_subs = scatteringDataset(scattering_dict_J4_L8, TRAIN_SUBJECT_IDS[:10])
-scattering_train_15_subs = scatteringDataset(scattering_dict_J4_L8, TRAIN_SUBJECT_IDS[:15])
-scattering_train_all_subs = scatteringDataset(scattering_dict_J4_L8, TRAIN_SUBJECT_IDS)
-scattering_test = scatteringDataset(scattering_dict_J4_L8, TEST_SUBJECT_IDS)
+scattering_train_5_subs = scatteringDataset(scattering_dir, TRAIN_SUBJECT_IDS[:5])
+scattering_train_10_subs = scatteringDataset(scattering_dir, TRAIN_SUBJECT_IDS[:10])
+scattering_train_15_subs = scatteringDataset(scattering_dir, TRAIN_SUBJECT_IDS[:15])
+scattering_train_all_subs = scatteringDataset(scattering_dir, TRAIN_SUBJECT_IDS)
+scattering_test = scatteringDataset(scattering_dir, TEST_SUBJECT_IDS)
 print('Done')
 
 print('Creating scattering DataLoaders...')
@@ -137,7 +137,7 @@ summary_file = 'resnet_all_subs.json'
 optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser)
 MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader, scheduler)
-MS_CNN_class.train(epochs = 50, validate = True)
+# MS_CNN_class.train(epochs = 50, validate = True)
 MS_CNN_class.create_model_summary('ResNet')
 MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
 MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
@@ -204,7 +204,7 @@ summary_file = 'shufflenet_all_subs.json'
 optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser)
 MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader, scheduler)
-MS_CNN_class.train(epochs = 50, validate = True)
+# MS_CNN_class.train(epochs = 50, validate = True)
 MS_CNN_class.create_model_summary('ShuffleNet')
 MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
 MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
