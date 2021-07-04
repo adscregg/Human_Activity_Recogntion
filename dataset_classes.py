@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms as T
 import os
 from PIL import Image
+import torch
 
 class scatteringDataset(Dataset):
     def __init__(self, scattering_dict = None, subjects = None):
@@ -32,15 +33,37 @@ class scatteringDataset(Dataset):
         self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject id to filter the dict keys by
         self.samples = [] # empty list, will contain samples to be accepted into the dataset
 
-        for k, v in self.scattering_dict.items(): # loop over the key, value pairs
-            if k[8:12] in self.subjects: # check if the subject id is in the list that are being accepted
-                self.samples.append(v) # add sample to accepted samples of the dataset
+        # for k, v in self.scattering_dict.items(): # loop over the key, value pairs
+        #     if k[8:12] in self.subjects: # check if the subject id is in the list that are being accepted
+        #         self.samples.append(v) # add sample to accepted samples of the dataset
+
+
+
+
+
+        for file in set(os.listdir(self.scattering_dict)).difference({'Thumbs.db'}):
+            if file[8:12] in self.subjects:
+                self.samples.append(file)
+
+    def __getitem__(self, idx):
+        fp = os.path.join(self.scattering_dict, self.samples[idx])
+        large, med, small, target = torch.load(fp)
+        large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32)
+
+        return large, med, small, target
+
+
+
+
+
+
+
 
     def __len__(self):
         return len(self.samples) # number of samples
 
-    def __getitem__(self, idx):
-        return self.samples[idx]
+    # def __getitem__(self, idx):
+    #     return self.samples[idx]
 
 
 class imageDataset(Dataset):
