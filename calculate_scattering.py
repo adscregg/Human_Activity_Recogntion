@@ -45,7 +45,7 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
 
     """
     files = set(os.listdir(image_dir)).difference({'Thumbs.db'}) # create a set of files, removing the unwanted Thumbs.db file if present
-    already_calc = set(os.listdir(save_dir))
+    # already_calc = set(os.listdir(save_dir))
 
 
     # Scattering network initialisation and moving to GPU
@@ -74,9 +74,9 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
     i = 0 # dummy counter variable
     for file in tqdm(files): # loop over each file in the directory
         f = file[:-4]
-        if f + '.pth' in already_calc:
-            print(f'{f} already exists!')
-            continue
+        # if f + '.pth' in already_calc:
+        #     # print(f'{f} already exists!')
+        #     pass
 
         path = os.path.join(image_dir, file) # path to the image itself
         image = Image.open(path).convert("RGB") # read in the image and convert to RGB to ensure 3 channels
@@ -110,8 +110,8 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
             for j, name in enumerate(in_stack):
                 # target value has -1 so the classes start at 0 rather than 1, better for pytorch networks to handle
                 # scattering_dict[in_stack[j]] = (coeffs_large[j], coeffs_med[j], coeffs_small[j], int(name[-3:])-1) # add the flattend coeffs and target to the dictionary with the key as the file name without the extension
-                torch.save((coeffs_large[j].type(torch.float64), coeffs_med[j].type(torch.float64), coeffs_small[j].type(torch.float64), int(name[-3:])-1), save_dir + name + '.pth')
-
+                torch.save((coeffs_large[j].type(torch.float16), coeffs_med[j].type(torch.float16), coeffs_small[j].type(torch.float16), int(name[-3:])-1), save_dir[0] + name + '.pth')
+                torch.save((coeffs_large[j].type(torch.float64), coeffs_med[j].type(torch.float64), coeffs_small[j].type(torch.float64), int(name[-3:])-1), save_dir[1] + name + '.pth')
             # reset the stacks and lists
             in_stack = list()
             stack_large = torch.Tensor()
@@ -126,5 +126,5 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
 
 if __name__ == '__main__':
     image_dir = './data/NTU_RGB+D/transformed_images'
-    save_dir = './data/NTU_RGB+D/scattering_coeffs/'
-    preprocessScatteringCoeffs(image_dir, save_dir, J = 4, batch_size = 64)
+    save_dir = ['./data/NTU_RGB+D/scattering_coeffs_16bit/', './data/NTU_RGB+D/scattering_coeffs_64bit/']
+    preprocessScatteringCoeffs(image_dir, save_dir, J = 4, batch_size = 128)
