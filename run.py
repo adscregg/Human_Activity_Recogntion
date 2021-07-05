@@ -153,9 +153,9 @@ class runModel:
         self.model.eval() # put the model into evaluate mode, removes layers, e.g. Dropout, that are only used for training
         self.test_loss = 0
         n_correct = 0
-
+        progress = tqdm(self.test_loader, desc = 'Testing')
         with torch.no_grad(): # let PyTorch know that no gradient information is needed as no training is being done, faster evaluation
-            for large, med, small, target in self.test_loader:
+            for large, med, small, target in progress:
                 large, med, small, target = large.to(self.device), med.to(self.device), small.to(self.device), target.to(self.device)
 
                 output = self.model(large, med, small)
