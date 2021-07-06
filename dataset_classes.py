@@ -6,64 +6,50 @@ from PIL import Image
 import torch
 
 class scatteringDataset(Dataset):
-    def __init__(self, scattering_dict = None, subjects = None):
+    def __init__(self, scattering_dir = None, subjects = None):
         """
         Dataset class for scattering coefficients stored in a dictionary
 
         Parameters
         ------------
-        scattering_dict: dict
-            keys of the form SsssCcccPpppRrrrAaaa where  sss is the setup number, ccc is the camera ID,
-            ppp is the performer (subject) ID, rrr is the replication number (1 or 2), and aaa is the action class label.
-
-            values are tuples of the form (torch.Tensor, ... torch.Tensor, target)
+        scattering_dir: str
+            file path to the precalculated and flattened scattering coeffs
 
         subject: list
             list of integers containing the performer (subject) IDs to be used in the dataset
 
         """
         # check if arguments have been passed and throw relevant error/warning
-        if scattering_dict is None:
-            raise ValueError('Please provide a dictionary of flattened and pooling scattering coeffs')
+        if scattering_dir is None:
+            raise ValueError('Please provide a file path to the flattened and pooling scattering coeffs')
         if subjects is None:
             warnings.warn('No value is specified for the subjects to be used, all subjects are being used by default')
             subjects = list(range(1,41)) # 40 subjects in the NTu RGB+D dataset
 
-        self.scattering_dict = scattering_dict
+        self.scattering_dir = scattering_dir
         self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject id to filter the dict keys by
         self.samples = [] # empty list, will contain samples to be accepted into the dataset
 
-        # for k, v in self.scattering_dict.items(): # loop over the key, value pairs
+        # for k, v in self.scattering_dir.items(): # loop over the key, value pairs
         #     if k[8:12] in self.subjects: # check if the subject id is in the list that are being accepted
         #         self.samples.append(v) # add sample to accepted samples of the dataset
 
-
-
-
-
-        for file in set(os.listdir(self.scattering_dict)).difference({'Thumbs.db'}):
+        for file in set(os.listdir(self.scattering_dir)).difference({'Thumbs.db'}):
             if file[8:12] in self.subjects:
                 self.samples.append(file)
 
+    def __len__(self):
+        return len(self.samples) # number of samples
+        
+
     def __getitem__(self, idx):
-        fp = os.path.join(self.scattering_dict, self.samples[idx])
+        fp = os.path.join(self.scattering_dir, self.samples[idx])
         large, med, small, target = torch.load(fp)
         large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32)
 
         return large, med, small, target
 
 
-
-
-
-
-
-
-    def __len__(self):
-        return len(self.samples) # number of samples
-
-    # def __getitem__(self, idx):
-    #     return self.samples[idx]
 
 
 class imageDataset(Dataset):
