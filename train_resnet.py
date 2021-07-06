@@ -23,10 +23,6 @@ TRAIN_SUBJECT_IDS = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28, 3
 TEST_SUBJECT_IDS = [3, 6, 7, 10, 11, 12, 20, 21, 22, 23, 24, 26, 29, 30, 32, 33, 38, 37, 39, 40]
 loss_fn = CrossEntropyLoss()
 
-def input_size(J, L):
-    n = 1 + L*J + L**2 * J * (J - 1)/2
-    n *= 3
-    return int(n)
 
 
 
@@ -56,17 +52,18 @@ print('Training ResNets:')
 # === 5 Subjects ===
 
 ResNet = resnet101(pretrained = True) # define model architecture
-# ResNet.fc = Identity() # remove final classification layer so multi-layer stucture can be implemented
-# MS_CNN = MultiScalePretrained(ResNet).to(DEVICE) # create multi-layer architecture model
-# weights_file = 'resnet_5_subs.pth' # file name of the weights of the model
-# summary_file = 'resnet_5_subs.json' # file name of the model summary
-# optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.001) # define the optimiser
-# scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser) # define the scheduler (optional, will change learning rate during training if supplied to runModel)
-# MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_5_subs, images_testloader, scheduler)
-# MS_CNN_class.train(epochs = 50, validate = True) # start training loop
-# MS_CNN_class.create_model_summary('ResNet') # create the model summary
-# MS_CNN_class.save_model(WEIGHTS_PATH + weights_file) # save model weights
-# MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file) # save model summary
+ResNet.fc = Identity() # remove final classification layer so multi-layer stucture can be implemented
+MS_CNN = MultiScalePretrained(ResNet).to(DEVICE) # create multi-layer architecture model
+weights_file = 'resnet_5_subs.pth' # file name of the weights of the model
+summary_file = 'resnet_5_subs.json' # file name of the model summary
+optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.01) # define the optimiser
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser) # define the scheduler (optional, will change learning rate during training if supplied to runModel)
+MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_5_subs, images_testloader, scheduler)
+MS_CNN_class.train(epochs = 30, validate = False) # start training loop
+MS_CNN_class.test()
+MS_CNN_class.create_model_summary('ResNet') # create the model summary
+MS_CNN_class.save_model(WEIGHTS_PATH + weights_file) # save model weights
+MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file) # save model summary
 
 
 # === 10 Subjects ===
@@ -104,14 +101,14 @@ ResNet = resnet101(pretrained = True)
 # === All Subjects ===
 
 ResNet = resnet101(pretrained = True)
-ResNet.fc = Identity()
-MS_CNN = MultiScalePretrained(ResNet).to(DEVICE)
-weights_file = 'resnet_all_subs.pth'
-summary_file = 'resnet_all_subs.json'
-optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.001)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser)
-MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader, scheduler)
-MS_CNN_class.train(epochs = 50, validate = False)
-MS_CNN_class.create_model_summary('ResNet')
-MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
-MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
+# ResNet.fc = Identity()
+# MS_CNN = MultiScalePretrained(ResNet).to(DEVICE)
+# weights_file = 'resnet_all_subs.pth'
+# summary_file = 'resnet_all_subs.json'
+# optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.001)
+# scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser)
+# MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader, scheduler)
+# MS_CNN_class.train(epochs = 50, validate = False)
+# MS_CNN_class.create_model_summary('ResNet')
+# MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
+# MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
