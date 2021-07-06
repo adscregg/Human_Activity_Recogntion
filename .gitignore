@@ -3,3 +3,4 @@ __pycache__
 weights
 model_summaries
 figures
+train_all.bat
