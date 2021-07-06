@@ -4,8 +4,10 @@ from tqdm import tqdm
 from time import time
 import json
 
+from torch.cuda.amp import autocast, GradScaler
+
 class runModel:
-    def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None):
+    def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None, use_amp = True):
         """
         Class for training and evaluating deep learning models
 
@@ -40,6 +42,9 @@ class runModel:
         self.test_loader = test_loader
         self.scheduler = scheduler
 
+        self.use_amp = use_amp
+        self.scaler = GradScaler(enabled=use_amp)
+
         self.n_parameters = sum([i.numel() for i in model.parameters()])
         self.num_test_samples = len(self.test_loader.dataset)
         self.num_train_samples = len(self.train_loader.dataset)
@@ -57,6 +62,8 @@ class runModel:
         self.lr_history = None
         self.average_time_per_epoch = None
         self.num_epochs = None
+
+        self.confusion_matrix = None
 
     def train(self, epochs, validate = False):
         """
@@ -93,23 +100,28 @@ class runModel:
                 # load samples and targets onto the specified device (cpu or gpu)
                 large, med, small, target = large.to(self.device), med.to(self.device), small.to(self.device), target.to(self.device)
 
-                self.optimiser.zero_grad() # ensures the gradient does not accumalate in the optimiser
+                with autocast(enabled=self.use_amp):
+                    output = self.model(large, med, small) # run the model
+                    loss = self.loss_fn(output, target) # calculate the loss
 
-                output = self.model(large, med, small) # run the model
-                loss = self.loss_fn(output, target) # calculate the loss
-
-                epoch_loss += loss.item()*target.size(0) # loss is the average for all sample in the batch, total loss is avg*batch_size
+                epoch_loss += loss*target.size(0) # loss is the average for all sample in the batch, total loss is avg*batch_size
                 pred = torch.argmax(output, dim = 1) # make the prediction by taking the largest output value for each sample
-                n_correct += (pred == target).float().sum().item() # calculate how many are correct
+                n_correct += (pred == target).float().sum()#.item() # calculate how many are correct
 
-                loss.backward() # backward pass through the model, or backpropagation
-                self.optimiser.step() # update the weights
+                # loss.backward() # backward pass through the model, or backpropagation
+                self.scaler.scale(loss).backward()
+
+                # self.optimiser.step() # update the weights
+                self.scaler.step(self.optimiser)
+                self.scaler.update()
+
+                self.optimiser.zero_grad(set_to_none=True) # ensures the gradient does not accumalate in the optimiser
 
             epoch_time = time() - start
             self._epoch_times.append(epoch_time)
 
-            self.train_loss = epoch_loss / self.num_train_samples
-            self.train_accuracy = n_correct / self.num_train_samples
+            self.train_loss = epoch_loss.item() / self.num_train_samples
+            self.train_accuracy = n_correct.long().item() / self.num_train_samples
 
             self.train_loss_history.append(self.train_loss) # average loss for all samples in the epoch
             self.train_acc_history.append(self.train_accuracy) # accuracy score, between 0 and 1
@@ -154,6 +166,7 @@ class runModel:
         self.test_loss = 0
         n_correct = 0
         progress = tqdm(self.test_loader, desc = 'Testing')
+        self.confusion_matrix = torch.zeros(self.model.n_classes, self.model.n_classes)
         with torch.no_grad(): # let PyTorch know that no gradient information is needed as no training is being done, faster evaluation
             for large, med, small, target in progress:
                 large, med, small, target = large.to(self.device), med.to(self.device), small.to(self.device), target.to(self.device)
@@ -165,8 +178,12 @@ class runModel:
                 pred = torch.argmax(output, dim = 1)
                 n_correct += (pred == target).float().sum().item()
 
+                for t, p in zip(target.flatten(), pred.flatten()):
+                    self.confusion_matrix[t.long(), p.long()] += 1
+
             self.test_loss /= self.num_test_samples
             self.test_accuracy = n_correct / self.num_test_samples
+            self.confusion_matrix = self.confusion_matrix.numpy().tolist()
 
     def save_model(self, file_path):
         """
@@ -215,6 +232,8 @@ class runModel:
 
         'lr history': self.lr_history,
         'avg time per epoch': self.average_time_per_epoch,
+
+        'confusion matrix': self.confusion_matrix
         }
 
     def save_model_summary(self, file_path):
