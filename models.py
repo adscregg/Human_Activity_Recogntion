@@ -17,6 +17,8 @@ class MultiScalePretrained(Module):
         """
         super().__init__()
 
+        self.n_classes = n_classes
+
         self.model = pretrained_model.cpu() # send pretrained model to cpu, ensures model can be redefined after being put on the gpu
         self._get_in_features() # function to calculate the input features or similaryly output shape of the pretrained models
 
@@ -67,6 +69,8 @@ class ScatteringModel(Module):
             Number of output classes
         """
         super().__init__()
+
+        self.n_classes = n_classes
 
         if hidden_units is None: # if no hidden units passed, a linear classifier is assumed
             self.classifier_large = Sequential(Linear(input_size, n_classes))
