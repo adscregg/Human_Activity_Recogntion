@@ -1,4 +1,4 @@
-from torch.nn import Module, Linear, ReLU, Sequential
+from torch.nn import Module, Linear, ReLU, Sequential, Dropout
 import torch
 
 
@@ -84,12 +84,17 @@ class ScatteringModel(Module):
             c_small = list()
 
             for unit in hidden_units:
-                # add a fully connected layer and ReLU activation to the lists
-                c_large.extend([Linear(input_size, unit), ReLU()])
-                c_med.extend([Linear(input_size, unit), ReLU()])
-                c_small.extend([Linear(input_size, unit), ReLU()])
+                if unit == 'D':
+                    c_large.append(Dropout(0.5))
+                    c_med.append(Dropout(0.5))
+                    c_small.append(Dropout(0.5))
+                else:
+                    # add a fully connected layer and ReLU activation to the lists
+                    c_large.extend([Linear(input_size, unit), ReLU()])
+                    c_med.extend([Linear(input_size, unit), ReLU()])
+                    c_small.extend([Linear(input_size, unit), ReLU()])
 
-                input_size = unit # the output of one layer become the input to another and so needs redefining
+                    input_size = unit # the output of one layer become the input to another and so needs redefining
 
             # add the final classification layer, the output to the number of classes
             c_large.append(Linear(input_size, n_classes))
