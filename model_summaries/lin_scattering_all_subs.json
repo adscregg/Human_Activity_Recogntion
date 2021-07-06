@@ -13,5 +13,6 @@
     "test accuracy history": null,
     "test loss history": null,
     "lr history": null,
-    "avg time per epoch": null
+    "avg time per epoch": null,
+    "confusion matrix": null
 }

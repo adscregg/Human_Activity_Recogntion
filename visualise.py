@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import json
 import os
+import numpy as np
+import seaborn as sns
 
 
 def visualise(data_dir, subjects = None, save_name = None):
@@ -60,6 +62,32 @@ def plot_curves(summary_dir, files, key, title, xlabel, ylabel):
     ax.legend()
     return fig, ax
 
+
+def plot_confusion_matrix(summary_dir, file, normalise = True):
+    fig, ax = plt.subplots()
+    with open(summary_dir + file) as f:
+        summary = json.load(f)
+    mat = np.array(summary['confusion matrix'])
+    if normalise:
+        mat /= mat.sum(axis = 1, keepdims=True)
+    nb_classes = mat.shape[0]
+    sns.heatmap(mat, cmap = 'Greys', vmax = 1, vmin = 0, ax = ax, cbar = False)
+
+    ticks = np.arange(0.5, nb_classes, 2).tolist()
+    tick_labels = ['A' + f"{int(np.ceil(i)):03}" for i in ticks]
+
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    ax.set_xticklabels(tick_labels, rotation = 90, fontsize = 12)
+    ax.set_yticklabels(tick_labels, rotation = 0, fontsize = 12)
+
+    ax.set_xlabel('Predicted', fontsize = 15, labelpad = 10)
+    ax.set_ylabel('True', fontsize = 15, labelpad = 10)
+
+    return fig, ax
+
+
+
 if __name__ == '__main__':
 
     data_dir = './data/NTU_RGB+D/transformed_images'
@@ -67,9 +95,8 @@ if __name__ == '__main__':
 
     save_fig_dir = './figures/'
 
-    fig, ax = plot_curves(summary_dir, ['test.json', 'test1.json'], 'lr history','lr', 'EPOCHS', 'ACCURACY')
-    fig1, ax1 = plot_curves(summary_dir, ['test.json', 'test1.json'], 'test accuracy history','test', 'EPOCHS', 'ACCURACY')
+    fig2, ax2 = plot_confusion_matrix(summary_dir, 'shallow_scattering_5_subs.json')
     plt.show()
 
-    fig.savefig(save_fig_dir + 'test1.pdf')
-    fig1.savefig(save_fig_dir + 'happy1.pdf')
+    # fig.savefig(save_fig_dir + 'test1.pdf')
+    # fig1.savefig(save_fig_dir + 'happy1.pdf')
