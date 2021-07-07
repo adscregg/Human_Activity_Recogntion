@@ -8,7 +8,7 @@ import numpy as np
 from torch.cuda.amp import autocast, GradScaler
 
 class runModel:
-    def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, use_amp = True):
+    def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None, use_amp = True):
         """
         Class for training and evaluating deep learning models
 
@@ -38,6 +38,7 @@ class runModel:
         self.loss_fn = loss_fn
         self.train_loader = train_loader
         self.test_loader = test_loader
+        self.scheduler = scheduler
 
         self.use_amp = use_amp
         self.scaler = GradScaler(enabled=use_amp)
@@ -48,22 +49,22 @@ class runModel:
 
         self.train_accuracy = None
         self.test_accuracy = None
-        self.train_acc_history = None
-        self.test_acc_history = None
+        self.train_acc_history = list()
+        self.test_acc_history = list()
 
         self.train_loss = None
         self.test_loss = None
-        self.train_loss_history = None
-        self.test_loss_history = None
+        self.train_loss_history = list()
+        self.test_loss_history = list()
 
-        self.lr_history = None
+        self.lr_history = list()
         self.average_time_per_epoch = None
         self.num_epochs = None
         self._epoch_times = list()
 
         self.confusion_matrix = None
 
-    def train(self, epochs, validate = False, early_stopping = True, max_no_improve = 1, every = None):
+    def train(self, epochs, validate = False):
         """
         Train the model
 
@@ -75,10 +76,6 @@ class runModel:
         validate: bool
             Whether to evaluate the model on the test set throughout the training process.
         """
-        if max_no_improve < 1:
-            max_no_improve = 1
-
-        stop = False
         # initialise lists to track the metrics on the training set throughout training
         self.train_loss_history = list()
         self.train_acc_history = list()
@@ -86,10 +83,8 @@ class runModel:
         self._epoch_times = list()
         self.num_epochs = epochs
 
-        self.min_test_loss = np.inf
+        # self.min_test_loss = np.inf
 
-        if every is None:
-            every = epochs - 1
 
         # if validate is set to True, track the metrics on the test set throughout training
         if validate:
@@ -98,8 +93,7 @@ class runModel:
 
 
         progress = tqdm(range(epochs), desc = 'Training')
-        progress.set_postfix(train_accuracy = f'{self.train_accuracy} (0)', train_loss = f'{self.train_loss} (0)',
-         test_acc = f'{self.test_accuracy} (0)', test_loss = f'{self.test_loss} (0)')
+        progress.set_postfix(train_accuracy = self.train_accuracy, train_loss = self.train_loss, test_acc = self.test_accuracy, test_loss = self.test_loss)
 
         for epoch in progress:
 
@@ -139,24 +133,25 @@ class runModel:
             self.train_acc_history.append(self.train_accuracy) # accuracy score, between 0 and 1
 
 
-            if validate and (epoch % every == 0 or epoch + 1 == epochs):
-                e_update = epoch + 1
+            if validate:
                 self.test() # run the test loop
 
                 # append the metrics on the test set
                 self.test_loss_history.append(self.test_loss)
                 self.test_acc_history.append(self.test_accuracy)
 
-                if early_stopping:
-                    if self.test_loss < self.min_test_loss:
-                        no_improve = 0
-                        self.min_test_loss = self.test_loss
-                    else:
-                        no_improve += 1
+                self.scheduler.step(self.test_loss)
 
-                    if no_improve == max_no_improve:
-                        stop = True
-                        print('Training stopped early due to no test loss improvement')
+                # if early_stopping:
+                #     if self.test_loss < self.min_test_loss:
+                #         no_improve = 0
+                #         self.min_test_loss = self.test_loss
+                #     else:
+                #         no_improve += 1
+                #
+                #     if no_improve == max_no_improve:
+                #         stop = True
+                #         print('Training stopped early due to no test loss improvement')
 
 
             else:
@@ -164,14 +159,11 @@ class runModel:
                 self.test_acc_history.append(None)
 
 
-            progress.set_postfix(train_accuracy = f'{round(self.train_accuracy, 3)} ({epoch + 1})', train_loss = f'{round(self.train_loss, 3)} ({epoch + 1})',
-             test_acc = f'{round(self.test_accuracy, 3)} ({e_update})', test_loss = f'{round(self.test_loss, 3)} ({e_update})') # update progress bar outputs
+            progress.set_postfix(train_accuracy = self.train_accuracy, train_loss = self.train_loss, test_acc = self.test_accuracy, test_loss = self.test_loss) # update progress bar outputs
 
 
             self.lr_history.append(self.optimiser.param_groups[0]['lr'])
 
-            if stop:
-                break
 
         self.average_time_per_epoch = sum(self._epoch_times)/len(self._epoch_times)
 
@@ -186,10 +178,10 @@ class runModel:
         self.model.eval() # put the model into evaluate mode, removes layers, e.g. Dropout, that are only used for training
         self.test_loss = 0
         n_correct = 0
-        progress = tqdm(self.test_loader, desc = 'Testing', leave=False, position = 0)
+        # progress = tqdm(self.test_loader, desc = 'Testing', leave=False, position = 0)
         self.confusion_matrix = torch.zeros(self.model.n_classes, self.model.n_classes)
         with torch.no_grad(): # let PyTorch know that no gradient information is needed as no training is being done, faster evaluation
-            for large, med, small, target in progress:
+            for large, med, small, target in self.test_loader:
                 large, med, small, target = large.to(self.device), med.to(self.device), small.to(self.device), target.to(self.device)
 
                 output = self.model(large, med, small)
