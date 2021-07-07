@@ -9,12 +9,12 @@ from models import MultiScalePretrained
 from run import runModel
 from identity import Identity
 
-print('Finished importing')
 
 # ============================ SETUP ===============================================================
 
 BATCH_SIZE = 64
-DATA_DIR = './data/NTU_RGB+D/transformed_images'
+# DATA_DIR = './data/NTU_RGB+D/transformed_images'
+DATA_DIR = 'C:/Local/transformed_images/'
 WEIGHTS_PATH = './weights/'
 SUMMARIES_PATH = './model_summaries/'
 DEVICE = 'cuda'
@@ -24,21 +24,19 @@ loss_fn = CrossEntropyLoss()
 
 
 
-print('Creating image datasets...')
 # create the image datasets with varying test sample sizes
+images_train_2_subs = imageDataset(DATA_DIR, TRAIN_SUBJECT_IDS[:2])
 images_train_5_subs = imageDataset(DATA_DIR, TRAIN_SUBJECT_IDS[:5])
 images_train_12_subs = imageDataset(DATA_DIR, TRAIN_SUBJECT_IDS[:12])
 images_train_all_subs = imageDataset(DATA_DIR, TRAIN_SUBJECT_IDS)
 images_test = imageDataset(DATA_DIR, TEST_SUBJECT_IDS)
-print('Done')
 
-print('Creating image DataLoaders...')
 # create Dataloader generator objects for the images datasets
+images_trainloader_2_subs = DataLoader(images_train_2_subs, batch_size = BATCH_SIZE, shuffle = True)
 images_trainloader_5_subs = DataLoader(images_train_5_subs, batch_size = BATCH_SIZE, shuffle = True)
 images_trainloader_12_subs = DataLoader(images_train_12_subs, batch_size = BATCH_SIZE, shuffle = True)
 images_trainloader_all_subs = DataLoader(images_train_all_subs, batch_size = BATCH_SIZE, shuffle = True)
 images_testloader = DataLoader(images_test, batch_size = BATCH_SIZE, shuffle = True)
-print('Done')
 
 
 
@@ -49,6 +47,21 @@ print('Done')
 print('Training ShuffleNets:')
 # ============== ShuffleNet =========================
 
+# === 2 Subjects ===
+
+ShuffleNet = shufflenet_v2_x1_0(pretrained = True)
+ShuffleNet.fc = Identity()
+MS_CNN = MultiScalePretrained(ShuffleNet).to(DEVICE)
+weights_file = 'shufflenet_2_subs.pth'
+summary_file = 'shufflenet_2_subs.json'
+optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.01)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_5_subs, images_testloader, scheduler)
+MS_CNN_class.train(epochs = 100, validate = True)
+MS_CNN_class.create_model_summary('ShuffleNet (2)')
+MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
+MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
+
 # === 5 Subjects ===
 
 ShuffleNet = shufflenet_v2_x1_0(pretrained = True)
@@ -57,8 +70,9 @@ MS_CNN = MultiScalePretrained(ShuffleNet).to(DEVICE)
 weights_file = 'shufflenet_5_subs.pth'
 summary_file = 'shufflenet_5_subs.json'
 optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.01)
-MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_5_subs, images_testloader)
-MS_CNN_class.train(epochs = 50, validate = True, every = 8)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_5_subs, images_testloader, scheduler)
+MS_CNN_class.train(epochs = 100, validate = True)
 MS_CNN_class.create_model_summary('ShuffleNet (5)')
 MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
 MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
@@ -72,8 +86,9 @@ MS_CNN = MultiScalePretrained(ShuffleNet).to(DEVICE)
 weights_file = 'shufflenet_12_subs.pth'
 summary_file = 'shufflenet_12_subs.json'
 optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.01)
-MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_12_subs, images_testloader)
-MS_CNN_class.train(epochs = 50, validate = True, every = 8)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_12_subs, images_testloader, scheduler)
+MS_CNN_class.train(epochs = 100, validate = True)
 MS_CNN_class.create_model_summary('ShuffleNet (12)')
 MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
 MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
@@ -87,8 +102,9 @@ MS_CNN = MultiScalePretrained(ShuffleNet).to(DEVICE)
 weights_file = 'shufflenet_all_subs.pth'
 summary_file = 'shufflenet_all_subs.json'
 optimiser = optim.Adam(MS_CNN.parameters(), lr = 0.01)
-MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader)
-MS_CNN_class.train(epochs = 50, validate = True, every = 8)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+MS_CNN_class = runModel(MS_CNN, DEVICE, optimiser, loss_fn, images_trainloader_all_subs, images_testloader, scheduler)
+MS_CNN_class.train(epochs = 100, validate = True)
 MS_CNN_class.create_model_summary('ShuffleNet (all)')
 MS_CNN_class.save_model(WEIGHTS_PATH + weights_file)
 MS_CNN_class.save_model_summary(SUMMARIES_PATH + summary_file)
