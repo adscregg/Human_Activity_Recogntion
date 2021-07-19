@@ -3,7 +3,7 @@ import torch
 
 
 class MultiScalePretrained(Module):
-    def __init__(self, pretrained_model = None, n_classes = 60):
+    def __init__(self, pretrained_model = None, n_classes = 60, device = 'cuda:0'):
         """
         Model using pretrained architechtures as the CNN feature extractor
 
@@ -18,8 +18,9 @@ class MultiScalePretrained(Module):
         super().__init__()
 
         self.n_classes = n_classes
+        self.device = device
 
-        self.model = pretrained_model.cpu() # send pretrained model to cpu, ensures model can be redefined after being put on the gpu
+        self.model = pretrained_model.to(self.device) # send pretrained model to cpu, ensures model can be redefined after being put on the gpu
         self._get_in_features() # function to calculate the input features or similaryly output shape of the pretrained models
 
         # define fully connected layers for each image size
@@ -29,7 +30,7 @@ class MultiScalePretrained(Module):
 
 
     def _get_in_features(self):
-        x = torch.randn(1,3,40,40) # mock data
+        x = torch.randn(1,3,40,40).to(self.device) # mock data
         output = self.model(x) # pass through pretraied model
         self._in_features = output.flatten().shape[0] # output shape of the pretrained model
 
