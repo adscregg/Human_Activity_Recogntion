@@ -34,18 +34,18 @@ class scatteringDataset(Dataset):
         #     if k[8:12] in self.subjects: # check if the subject id is in the list that are being accepted
         #         self.samples.append(v) # add sample to accepted samples of the dataset
 
-        for file in set(os.listdir(self.scattering_dir)).difference({'Thumbs.db'}):
-            if file[8:12] in self.subjects:
+        for file in set(os.listdir(self.scattering_dir)).difference({'Thumbs.db'}): # remove the Thumbs.db file if present
+            if file[8:12] in self.subjects: # if the participant string is in the file name
                 self.samples.append(file)
 
     def __len__(self):
         return len(self.samples) # number of samples
-        
+
 
     def __getitem__(self, idx):
-        fp = os.path.join(self.scattering_dir, self.samples[idx])
+        fp = os.path.join(self.scattering_dir, self.samples[idx]) # file path
         large, med, small, target = torch.load(fp)
-        large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32)
+        large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32) # convert to 32 bit tensors
 
         return large, med, small, target
 

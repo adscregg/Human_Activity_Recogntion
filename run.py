@@ -31,6 +31,12 @@ class runModel:
 
         test_loader: torch.utils.data.DataLoader
             Generator object of the training samples for testing
+
+        scheduler: torch.optimi.lr_scheduler
+            Reduce the learning rate during training to avoid overfitting, only takes affect if validation cycle is done (validate = True)
+
+        use_amp: bool
+            whether to use mixed precision during training
         """
         self.model = model
         self.device = device
@@ -139,8 +145,12 @@ class runModel:
                 # append the metrics on the test set
                 self.test_loss_history.append(self.test_loss)
                 self.test_acc_history.append(self.test_accuracy)
-
-                self.scheduler.step(self.test_loss)
+                
+                if self.scheduler is not None:
+                    if 'metrics' in inspect.getfullargspec(self.scheduler.step)[0]:
+                        self.scheduler.step(self.test_loss)
+                    else:
+                        self.scheduler.step()
 
                 # if early_stopping:
                 #     if self.test_loss < self.min_test_loss:
@@ -163,6 +173,10 @@ class runModel:
 
 
             self.lr_history.append(self.optimiser.param_groups[0]['lr'])
+
+            # if self.optimiser.param_groups[0]['lr'] < 9e-5:
+            #     print('Stopped Training early due to lack of improvement of the test loss')
+            #     break
 
 
         self.average_time_per_epoch = sum(self._epoch_times)/len(self._epoch_times)
