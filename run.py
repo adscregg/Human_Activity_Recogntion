@@ -7,6 +7,8 @@ import numpy as np
 
 from torch.cuda.amp import autocast, GradScaler
 
+
+
 class runModel:
     def __init__(self, model, device, optimiser, loss_fn, train_loader, test_loader, scheduler = None, use_amp = True):
         """
@@ -69,6 +71,8 @@ class runModel:
         self._epoch_times = list()
 
         self.confusion_matrix = None
+
+
 
     def train(self, epochs, validate = False):
         """
@@ -145,24 +149,12 @@ class runModel:
                 # append the metrics on the test set
                 self.test_loss_history.append(self.test_loss)
                 self.test_acc_history.append(self.test_accuracy)
-                
+
                 if self.scheduler is not None:
                     if 'metrics' in inspect.getfullargspec(self.scheduler.step)[0]:
                         self.scheduler.step(self.test_loss)
                     else:
                         self.scheduler.step()
-
-                # if early_stopping:
-                #     if self.test_loss < self.min_test_loss:
-                #         no_improve = 0
-                #         self.min_test_loss = self.test_loss
-                #     else:
-                #         no_improve += 1
-                #
-                #     if no_improve == max_no_improve:
-                #         stop = True
-                #         print('Training stopped early due to no test loss improvement')
-
 
             else:
                 self.test_loss_history.append(None)
@@ -174,12 +166,9 @@ class runModel:
 
             self.lr_history.append(self.optimiser.param_groups[0]['lr'])
 
-            # if self.optimiser.param_groups[0]['lr'] < 9e-5:
-            #     print('Stopped Training early due to lack of improvement of the test loss')
-            #     break
-
-
         self.average_time_per_epoch = sum(self._epoch_times)/len(self._epoch_times)
+
+
 
     def test(self):
         """
@@ -212,6 +201,8 @@ class runModel:
             self.test_accuracy = n_correct / self.num_test_samples
             self.confusion_matrix = self.confusion_matrix.numpy().tolist()
 
+
+
     def save_model(self, file_path):
         """
         Save the weights of the model
@@ -222,6 +213,7 @@ class runModel:
             Save location of the model weights. Common PyTorch convention is to save models using either a .pt or .pth file extension
         """
         torch.save(self.model.state_dict(), file_path)
+
 
 
     def load_weights(self, file_path):
@@ -235,6 +227,7 @@ class runModel:
         """
         self.model.load_state_dict(torch.load(file_path))
         self.model.eval() # default to evaluation mode after loading the weights
+
 
 
     def create_model_summary(self, name):
@@ -263,6 +256,8 @@ class runModel:
 
         'confusion matrix': self.confusion_matrix
         }
+
+
 
     def save_model_summary(self, file_path):
         with open(file_path, 'w') as fp:
