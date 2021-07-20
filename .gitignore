@@ -1,6 +1,9 @@
 data
 __pycache__
-weights
-model_summaries
+weights_batch64
+model_summaries_batch64
 figures
 train_all.bat
+misc
+main.py
+weights
