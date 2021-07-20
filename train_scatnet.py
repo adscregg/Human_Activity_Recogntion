@@ -11,10 +11,9 @@ from run import runModel
 
 # ============================ SETUP ===============================================================
 
-BATCH_SIZE = 64
-DATA_DIR = './data/NTU_RGB+D/transformed_images'
-WEIGHTS_PATH = './weights/'
-SUMMARIES_PATH = './model_summaries/'
+BATCH_SIZE = 128
+WEIGHTS_PATH = './weights/ScatNet_Deep/'
+SUMMARIES_PATH = './model_summaries/ScatNet_Deep/'
 DEVICE = 'cuda'
 TRAIN_SUBJECT_IDS = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28, 31, 34, 35, 38]
 TEST_SUBJECT_IDS = [3, 6, 7, 10, 11, 12, 20, 21, 22, 23, 24, 26, 29, 30, 32, 33, 38, 37, 39, 40]
@@ -26,9 +25,7 @@ def input_size(J, L):
     return int(n)
 
 
-# scattering_dict_J4_L8 = preprocessScatteringCoeffs(DATA_DIR, save_dir = None, J = 4, L = 8, batch_size = 64) # precalculate the flattened and pooled scattering coeffs
-# scattering_dir = 'C:/Local/scattering_coeffs_64bit/'
-scattering_dir = './data/NTU_RGB+D/scattering_coeffs_16bit/'
+scattering_dir = 'C:/Local/scattering_coeffs_64bit/'
 in_size_J4_L8 = input_size(4, 8)
 
 # create the scattering datasets with varying test sample sizes
@@ -54,15 +51,15 @@ scattering_testloader = DataLoader(scattering_test, batch_size = BATCH_SIZE, shu
 print('Training Scattering Models:')
 # ============  Scattering =====================
 
-layers = [256, 512, 'D']
+layers = [512, 1024, 1024, 512, 256]
 
 # === 2 Subjects ===
 
 ScatNet = ScatteringModel(in_size_J4_L8, layers).to(DEVICE)
 weights_file = 'scattering_2_subs.pth'
 summary_file = 'scattering_2_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
+scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 50)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_2_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
 ScatNet_class.create_model_summary('Scattering (2)')
@@ -77,8 +74,8 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 ScatNet = ScatteringModel(in_size_J4_L8, layers).to(DEVICE)
 weights_file = 'scattering_5_subs.pth'
 summary_file = 'scattering_5_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
+scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 50)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_5_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
 ScatNet_class.create_model_summary('Scattering (5)')
@@ -91,8 +88,8 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 ScatNet = ScatteringModel(in_size_J4_L8, layers).to(DEVICE)
 weights_file = 'scattering_12_subs.pth'
 summary_file = 'scattering_12_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
+scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 50)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_12_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
 ScatNet_class.create_model_summary('Scattering (12)')
@@ -105,8 +102,8 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 ScatNet = ScatteringModel(in_size_J4_L8, layers).to(DEVICE)
 weights_file = 'scattering_all_subs.pth'
 summary_file = 'scattering_all_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimiser, factor = 0.2, patience = 10, verbose = True)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
+scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 50)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_all_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
 ScatNet_class.create_model_summary('Scattering (all)')
