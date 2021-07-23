@@ -7,7 +7,7 @@ from kymatio.torch import Scattering2D
 from tqdm import tqdm
 
 
-def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, large = (100,100), med = (64,64), small = (40,40)):
+def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, large = (128,128), med = (64,64), small = (40,40)):
     """
     Calculates the pooled and flattened scattering coefficients for all images in a directory
 
@@ -29,7 +29,7 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
         Number of samples to calculate scattering coefficients of in a single pass. Defaults to 64
 
     large: tuple (N, M)
-        size to reshape image to. Defaults to (100, 100)
+        size to reshape image to. Defaults to (128, 128)
 
     med: tuple (N, M)
         see `large`. Defaults to (64, 64)
@@ -74,7 +74,7 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
     for file in tqdm(files): # loop over each file in the directory
         f = file[:-4]
         if f + '.pth' in already_calc:
-            print(f'{f} already exists!')
+            # print(f'{f} already exists!')
             continue
 
         path = os.path.join(image_dir, file) # path to the image itself
@@ -125,5 +125,5 @@ def preprocessScatteringCoeffs(image_dir, save_dir, J, L= 8, batch_size = 64, la
 
 if __name__ == '__main__':
     image_dir = './data/NTU_RGB+D/transformed_images'
-    save_dir = './data/NTU_RGB+D/scattering_coeffs_64bit/'
-    preprocessScatteringCoeffs(image_dir, save_dir, J = 4, batch_size = 128)
+    save_dir = './data/NTU_RGB+D/scattering_coeffs_J5/'
+    preprocessScatteringCoeffs(image_dir, save_dir, J = 5, batch_size = 128)
