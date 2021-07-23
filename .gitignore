@@ -7,3 +7,4 @@ train_all.bat
 misc
 main.py
 weights
+.mypy_cache
