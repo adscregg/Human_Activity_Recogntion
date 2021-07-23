@@ -35,7 +35,7 @@ class MultiScalePretrained(Module):
         self._in_features = output.flatten().shape[0] # output shape of the pretrained model
 
 
-    def forward(self, large, med, small):
+    def forward(self, large, med, small = None):
         # pass images through pretrained network and add linear classifier to the end
         out_large = self.model(large)
         out_large = self.fc_large(out_large)
@@ -43,10 +43,16 @@ class MultiScalePretrained(Module):
         out_med = self.model(med)
         out_med = self.fc_med(out_med)
 
-        out_small = self.model(small)
-        out_small = self.fc_small(out_small)
+        if small is not None:
+            out_small = self.model(small)
+            out_small = self.fc_small(out_small)
 
-        out = (out_large + out_med + out_small)/3 # average the outputs of the 3 scales of images for final classification
+            out = (out_large + out_med + out_small)/3 # average the outputs of the 3 scales of images for final classification
+
+        else:
+            # out_large = torch.nn.functional.softmax(out_large)
+            # out_med = torch.nn.functional.softmax(out_med)
+            out = (out_large + out_med)/2
 
         return out
 
@@ -107,13 +113,20 @@ class ScatteringModel(Module):
             self.classifier_med = Sequential(*c_med)
             self.classifier_small = Sequential(*c_small)
 
-    def forward(self, large, med, small):
+    def forward(self, large, med, small = None):
 
         # pass data through the classifiers
         out_large = self.classifier_large(large)
         out_med = self.classifier_med(med)
-        out_small = self.classifier_small(small)
 
-        out = (out_large + out_med + out_small)/3 # average the outputs for final classification
+        if small is not None:
+            out_small = self.classifier_small(small)
+            out = (out_large + out_med + out_small)/3 # average the outputs for final classification
+
+        else:
+            # out_large = torch.nn.functional.softmax(out_large)
+            # out_med = torch.nn.functional.softmax(out_med)
+            out = (out_large + out_med)/2
+
 
         return out
