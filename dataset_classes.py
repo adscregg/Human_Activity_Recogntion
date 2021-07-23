@@ -53,7 +53,7 @@ class scatteringDataset(Dataset):
 
 
 class imageDataset(Dataset):
-    def __init__(self, image_dir = None, subjects = None, large = (100,100), med = (64,64), small = (40,40)):
+    def __init__(self, image_dir = None, subjects = None, large = (128,128), med = (64,64), small = (40,40)):
         """
         Dataset class for a directory of images
 
