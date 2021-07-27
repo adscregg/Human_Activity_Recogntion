@@ -1,5 +1,7 @@
-from torch.nn import Module, Linear, ReLU, Sequential, Dropout
+from torch.nn import Module, Linear, ReLU, Sequential, Dropout, Conv2d, BatchNorm2d, AdaptiveAvgPool2d
+from kymatio.torch import Scattering2D
 import torch
+from time import time
 
 
 class MultiScalePretrained(Module):
@@ -130,3 +132,45 @@ class ScatteringModel(Module):
 
 
         return out
+
+
+class ScatNetCNNHybrid(Module):
+    def __init__(self, J=4, L=8, shape = (128,128)):
+        super().__init__()
+        self.J = J
+        self.L = L
+
+        self.scattering = Scattering2D(J=J, L=L, shape = shape)
+
+        self.K = int(3*(1 + J*L + (L**2)*J*(J-1)/2))
+        # self.bn = BatchNorm2d(self.K)
+
+        self.convs = [Conv2d(self.K, 256, kernel_size = 3, padding = 1), ReLU(),
+                    Conv2d(256, 512, kernel_size = 3, padding = 1), ReLU(),
+                    Conv2d(512, 512, kernel_size = 3, padding = 1), ReLU(),
+                    Conv2d(512, 1024, kernel_size = 3, padding = 1), ReLU()]
+
+        self.convs.append(AdaptiveAvgPool2d(1))
+
+        self.convs = Sequential(*self.convs)
+
+        self.fc = Linear(1024, 60)
+
+
+    def forward(self, x):
+        # out = self.scattering(x)
+        # out = out.view(-1, self.K, 8, 8)
+        out = self.convs(x)
+        out = torch.flatten(out, start_dim = 1)
+        out = self.fc(out)
+
+        return out
+
+if __name__ == "__main__":
+    model = ScatNetCNNHybrid(3,8).cuda()
+    x = torch.randn(128,3,128,128).cuda()
+    t = time()
+    for i in range(500):
+        print(model(x).shape, i)
+    print(time()-t)
+    print(sum([i.numel() for i in model.parameters()]))
