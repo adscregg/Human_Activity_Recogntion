@@ -6,7 +6,7 @@ from PIL import Image
 import torch
 
 class scatteringDataset(Dataset):
-    def __init__(self, scattering_dir = None, subjects = None):
+    def __init__(self, scattering_dir = None, subjects = None, multi = True):
         """
         Dataset class for scattering coefficients stored in a dictionary
 
@@ -19,6 +19,7 @@ class scatteringDataset(Dataset):
             list of integers containing the performer (subject) IDs to be used in the dataset
 
         """
+        self.multi = multi
         # check if arguments have been passed and throw relevant error/warning
         if scattering_dir is None:
             raise ValueError('Please provide a file path to the flattened and pooling scattering coeffs')
@@ -43,11 +44,17 @@ class scatteringDataset(Dataset):
 
 
     def __getitem__(self, idx):
-        fp = os.path.join(self.scattering_dir, self.samples[idx]) # file path
-        large, med, small, target = torch.load(fp)
-        large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32) # convert to 32 bit tensors
+        if self.multi:
+            fp = os.path.join(self.scattering_dir, self.samples[idx]) # file path
+            large, med, small, target = torch.load(fp)
+            large, med, small = large.type(torch.float32), med.type(torch.float32), small.type(torch.float32) # convert to 32 bit tensors
+            return large, med, small, target
+        else:
+            fp = os.path.join(self.scattering_dir, self.samples[idx]) # file path
+            large, target = torch.load(fp)
+            large = large.type(torch.float32) # convert to 32 bit tensors
+            return large, target
 
-        return large, med, small, target
 
 
 
