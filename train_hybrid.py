@@ -74,13 +74,13 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 
 # ==== 20 subs ====
 
-# ScatNet = ScatNetCNNHybrid().to(DEVICE)
-# weights_file = 'hybrid_all_subs.pth'
-# summary_file = 'hybrid_all_subs.json'
-# optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
-# scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
-# ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_all_subs, scattering_testloader, scheduler)
-# ScatNet_class.train(epochs = 100, validate = True)
-# ScatNet_class.create_model_summary('Hybrid (all)')
-# ScatNet_class.save_model(WEIGHTS_PATH + weights_file)
-# ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
+ScatNet = ScatNetCNNHybrid().to(DEVICE)
+weights_file = 'hybrid_all_subs.pth'
+summary_file = 'hybrid_all_subs.json'
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
+scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
+ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_all_subs, scattering_testloader, scheduler)
+ScatNet_class.train(epochs = 100, validate = True)
+ScatNet_class.create_model_summary('Hybrid (all)')
+ScatNet_class.save_model(WEIGHTS_PATH + weights_file)
+ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
