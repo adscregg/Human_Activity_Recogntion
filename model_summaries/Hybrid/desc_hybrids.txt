@@ -1,0 +1,10 @@
+self.convs = [Conv2d(self.K, 256, kernel_size = 3, padding = 1), ReLU(),
+            Conv2d(256, 512, kernel_size = 3, padding = 1), ReLU(),
+            Conv2d(512, 512, kernel_size = 3, padding = 1), ReLU(),
+            Conv2d(512, 1024, kernel_size = 3, padding = 1), ReLU()]
+
+self.convs.append(AdaptiveAvgPool2d(1))
+
+self.convs = Sequential(*self.convs)
+
+self.fc = Linear(1024, 60)
