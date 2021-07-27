@@ -138,15 +138,17 @@ if __name__ == '__main__':
 
     res_dir = './model_summaries/ResNet/'
     shuffle_dir = './model_summaries/ShuffleNet/'
-    scatnet_lin_dir = './model_summaries/ScatNet_Linear/'
-    scatnet_shallow_dir = './model_summaries/ScatNet_Shallow/'
-    scatnet_deep_dir = './model_summaries/ScatNet_Deep/'
+    scatnet_lin_dir = './model_summaries/J4_L8/ScatNet_Linear/'
+    scatnet_shallow_dir = './model_summaries/J4_L8/ScatNet_Shallow/'
+    scatnet_deep_dir = './model_summaries/J4_L8/ScatNet_Deep/'
+    hybrid_dir = './model_summaries/Hybrid/'
 
     save_fig_dir = './figures/'
 
     scatterings = ['scattering_2_subs.json','scattering_5_subs.json','scattering_12_subs.json','scattering_all_subs.json']
     resnets = ['resnet_2_subs.json','resnet_5_subs.json','resnet_12_subs.json','resnet_all_subs.json']
     shufflenets = ['shufflenet_2_subs.json','shufflenet_5_subs.json','shufflenet_12_subs.json','shufflenet_all_subs.json']
+    hybrids = ['hybrid_2_subs.json','hybrid_5_subs.json','hybrid_12_subs.json','hybrid_all_subs.json']
 
     resnets_scratch = ['resnet_2_subs_scratch.json','resnet_5_subs_scratch.json','resnet_12_subs_scratch.json','resnet_all_subs_scratch.json']
     shufflenets_scratch = ['shufflenet_2_subs_scratch.json','shufflenet_5_subs_scratch.json','shufflenet_12_subs_scratch.json','shufflenet_all_subs_scratch.json']
@@ -201,6 +203,14 @@ if __name__ == '__main__':
     change_legend(L_shuffle_loss)
     _grid(ax_shuffle_loss, 10, 5, 1, 5, (0,100), (0,6))
 
+    fig_hybrid_acc, ax_hybrid_acc, L_hybrid_acc = plot_curves(hybrid_dir, hybrids, train_test_acc_keys, 'Hybrid ScatNet CNN', 'Accuracy')
+    change_legend(L_hybrid_acc)
+    _grid(ax_hybrid_acc, 10, 5, 0.1, 5, (0,100), (0,1))
+
+    fig_hybrid_loss, ax_hybrid_loss, L_hybrid_loss = plot_curves(hybrid_dir, hybrids, train_test_loss_keys, 'Hybrid ScatNet CNN', 'Loss')
+    change_legend(L_hybrid_loss)
+    _grid(ax_hybrid_loss, 10, 5, 1, 5, (0,100), (0,6))
+
     plt.close('all')
 
 
@@ -231,6 +241,11 @@ if __name__ == '__main__':
 
     plt.close('all')
 
+    fig_conf_mat_hybrid2, ax_conf_mat_hybrid2 = plot_confusion_matrix(hybrid_dir, 'hybrid_2_subs.json')
+    fig_conf_mat_hybrid5, ax_conf_mat_hybrid5 = plot_confusion_matrix(hybrid_dir, 'hybrid_5_subs.json')
+    fig_conf_mat_hybrid12, ax_conf_mat_hybrid12 = plot_confusion_matrix(hybrid_dir, 'hybrid_12_subs.json')
+    fig_conf_mat_hybrid20, ax_conf_mat_hybrid20 = plot_confusion_matrix(hybrid_dir, 'hybrid_all_subs.json')
+
 
 
 
@@ -248,6 +263,9 @@ if __name__ == '__main__':
 
     fig_shuffle_acc.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_acc.pdf', bbox_inches = 'tight')
     fig_shuffle_loss.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_loss.pdf', bbox_inches = 'tight')
+
+    fig_hybrid_acc.savefig(save_fig_dir + 'curves/Hybrid/hybrid_acc.pdf', bbox_inches = 'tight')
+    fig_hybrid_loss.savefig(save_fig_dir + 'curves/Hybrid/hybrid_loss.pdf', bbox_inches = 'tight')
 
 
 
@@ -275,3 +293,8 @@ if __name__ == '__main__':
     fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_5.pdf', bbox_inches = 'tight')
     fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
     fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
+
+    fig_conf_mat_hybrid2.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_2.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_5.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
