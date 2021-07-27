@@ -294,7 +294,7 @@ if __name__ == '__main__':
     fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
     fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
 
-    fig_conf_mat_hybrid2.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_2.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_5.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
+    fig_conf_mat_hybrid2.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_2.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_5.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_12.pdf', bbox_inches = 'tight')
+    fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_20.pdf', bbox_inches = 'tight')
