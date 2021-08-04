@@ -138,9 +138,9 @@ if __name__ == '__main__':
 
     res_dir = './model_summaries/ResNet/'
     shuffle_dir = './model_summaries/ShuffleNet/'
-    scatnet_lin_dir = './model_summaries/J4_L8/ScatNet_Linear/'
-    scatnet_shallow_dir = './model_summaries/J4_L8/ScatNet_Shallow/'
-    scatnet_deep_dir = './model_summaries/J4_L8/ScatNet_Deep/'
+    scatnet_lin_dir = './model_summaries/J2_L8_44/ScatNet_Linear/'
+    scatnet_shallow_dir = './model_summaries/J2_L8_44/ScatNet_Shallow/'
+    scatnet_deep_dir = './model_summaries/J2_L8_44/ScatNet_Deep/'
     hybrid_dir = './model_summaries/Hybrid/'
 
     save_fig_dir = './figures/'
@@ -249,52 +249,52 @@ if __name__ == '__main__':
 
 
 
-    fig_scat_lin_acc.savefig(save_fig_dir + 'curves/ScatNet_Linear/scat_acc_lin.pdf', bbox_inches = 'tight')
-    fig_scat_lin_loss.savefig(save_fig_dir + 'curves/ScatNet_Linear/scat_loss_lin.pdf', bbox_inches = 'tight')
+    fig_scat_lin_acc.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Linear/scat_acc_lin.pdf', bbox_inches = 'tight')
+    fig_scat_lin_loss.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Linear/scat_loss_lin.pdf', bbox_inches = 'tight')
 
-    fig_scat_shallow_acc.savefig(save_fig_dir + 'curves/ScatNet_Shallow/scat_acc_shallow.pdf', bbox_inches = 'tight')
-    fig_scat_shallow_loss.savefig(save_fig_dir + 'curves/ScatNet_Shallow/scat_loss_shallow.pdf', bbox_inches = 'tight')
+    fig_scat_shallow_acc.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Shallow/scat_acc_shallow.pdf', bbox_inches = 'tight')
+    fig_scat_shallow_loss.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Shallow/scat_loss_shallow.pdf', bbox_inches = 'tight')
 
-    fig_scat_deep_acc.savefig(save_fig_dir + 'curves/ScatNet_Deep/scat_acc_deep.pdf', bbox_inches = 'tight')
-    fig_scat_deep_loss.savefig(save_fig_dir + 'curves/ScatNet_Deep/scat_loss_deep.pdf', bbox_inches = 'tight')
+    fig_scat_deep_acc.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Deep/scat_acc_deep.pdf', bbox_inches = 'tight')
+    fig_scat_deep_loss.savefig(save_fig_dir + 'curves/J2_L8_44/ScatNet_Deep/scat_loss_deep.pdf', bbox_inches = 'tight')
 
-    fig_res_acc.savefig(save_fig_dir + 'curves/ResNet/res_acc.pdf', bbox_inches = 'tight')
-    fig_res_loss.savefig(save_fig_dir + 'curves/ResNet/res_loss.pdf', bbox_inches = 'tight')
+    # fig_res_acc.savefig(save_fig_dir + 'curves/ResNet/res_acc.pdf', bbox_inches = 'tight')
+    # fig_res_loss.savefig(save_fig_dir + 'curves/ResNet/res_loss.pdf', bbox_inches = 'tight')
+    #
+    # fig_shuffle_acc.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_acc.pdf', bbox_inches = 'tight')
+    # fig_shuffle_loss.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_loss.pdf', bbox_inches = 'tight')
+    #
+    # fig_hybrid_acc.savefig(save_fig_dir + 'curves/Hybrid/hybrid_acc.pdf', bbox_inches = 'tight')
+    # fig_hybrid_loss.savefig(save_fig_dir + 'curves/Hybrid/hybrid_loss.pdf', bbox_inches = 'tight')
 
-    fig_shuffle_acc.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_acc.pdf', bbox_inches = 'tight')
-    fig_shuffle_loss.savefig(save_fig_dir + 'curves/ShuffleNet/shuffle_loss.pdf', bbox_inches = 'tight')
-
-    fig_hybrid_acc.savefig(save_fig_dir + 'curves/Hybrid/hybrid_acc.pdf', bbox_inches = 'tight')
-    fig_hybrid_loss.savefig(save_fig_dir + 'curves/Hybrid/hybrid_loss.pdf', bbox_inches = 'tight')
 
 
+    fig_conf_mat_scat2_lin.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Linear/conf_mat_scat_2_lin.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat5_lin.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Linear/conf_mat_scat_5_lin.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat12_lin.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Linear/conf_mat_scat_12_lin.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat20_lin.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Linear/conf_mat_scat_20_lin.pdf', bbox_inches = 'tight')
 
-    fig_conf_mat_scat2_lin.savefig(save_fig_dir + 'confusion_mats/ScatNet_Linear/conf_mat_scat_2_lin.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat5_lin.savefig(save_fig_dir + 'confusion_mats/ScatNet_Linear/conf_mat_scat_5_lin.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat12_lin.savefig(save_fig_dir + 'confusion_mats/ScatNet_Linear/conf_mat_scat_12_lin.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat20_lin.savefig(save_fig_dir + 'confusion_mats/ScatNet_Linear/conf_mat_scat_20_lin.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat2_shallow.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Shallow/conf_mat_scat_2_shallow.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat5_shallow.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Shallow/conf_mat_scat_5_shallow.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat12_shallow.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Shallow/conf_mat_scat_12_shallow.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat20_shallow.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Shallow/conf_mat_scat_20_shallow.pdf', bbox_inches = 'tight')
 
-    fig_conf_mat_scat2_shallow.savefig(save_fig_dir + 'confusion_mats/ScatNet_Shallow/conf_mat_scat_2_shallow.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat5_shallow.savefig(save_fig_dir + 'confusion_mats/ScatNet_Shallow/conf_mat_scat_5_shallow.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat12_shallow.savefig(save_fig_dir + 'confusion_mats/ScatNet_Shallow/conf_mat_scat_12_shallow.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat20_shallow.savefig(save_fig_dir + 'confusion_mats/ScatNet_Shallow/conf_mat_scat_20_shallow.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat2_deep.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Deep/conf_mat_scat_2_deep.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat5_deep.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Deep/conf_mat_scat_5_deep.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat12_deep.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Deep/conf_mat_scat_12_deep.pdf', bbox_inches = 'tight')
+    fig_conf_mat_scat20_deep.savefig(save_fig_dir + 'confusion_mats/J2_L8_44/ScatNet_Deep/conf_mat_scat_20_deep.pdf', bbox_inches = 'tight')
 
-    fig_conf_mat_scat2_deep.savefig(save_fig_dir + 'confusion_mats/ScatNet_Deep/conf_mat_scat_2_deep.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat5_deep.savefig(save_fig_dir + 'confusion_mats/ScatNet_Deep/conf_mat_scat_5_deep.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat12_deep.savefig(save_fig_dir + 'confusion_mats/ScatNet_Deep/conf_mat_scat_12_deep.pdf', bbox_inches = 'tight')
-    fig_conf_mat_scat20_deep.savefig(save_fig_dir + 'confusion_mats/ScatNet_Deep/conf_mat_scat_20_deep.pdf', bbox_inches = 'tight')
-
-    fig_conf_mat_res2.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_2.pdf', bbox_inches = 'tight')
-    fig_conf_mat_res5.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_5.pdf', bbox_inches = 'tight')
-    fig_conf_mat_res12.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_12.pdf', bbox_inches = 'tight')
-    fig_conf_mat_res20.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_20.pdf', bbox_inches = 'tight')
-
-    fig_conf_mat_shuffle2.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_2.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_5.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
-
-    fig_conf_mat_hybrid2.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_2.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_5.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_12.pdf', bbox_inches = 'tight')
-    fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_20.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_res2.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_2.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_res5.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_5.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_res12.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_12.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_res20.savefig(save_fig_dir + 'confusion_mats/ResNet/conf_mat_res_20.pdf', bbox_inches = 'tight')
+    #
+    # fig_conf_mat_shuffle2.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_2.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_5.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_12.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/ShuffleNet/conf_mat_shuffle_20.pdf', bbox_inches = 'tight')
+    #
+    # fig_conf_mat_hybrid2.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_2.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle5.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_5.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle12.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_12.pdf', bbox_inches = 'tight')
+    # fig_conf_mat_shuffle20.savefig(save_fig_dir + 'confusion_mats/Hybrid/conf_mat_hybrid_20.pdf', bbox_inches = 'tight')

@@ -3,7 +3,7 @@ from torch.nn import CrossEntropyLoss
 from torch import optim
 import matplotlib.pyplot as plt
 
-from calculate_scattering import preprocessScatteringCoeffs
+# from calculate_scattering import preprocessScatteringCoeffs
 from dataset_classes import scatteringDataset
 from models import ScatteringModel
 from run import runModel
@@ -12,8 +12,8 @@ from run import runModel
 # ============================ SETUP ===============================================================
 
 BATCH_SIZE = 128
-WEIGHTS_PATH = './weights/J5_L8/ScatNet_Shallow/'
-SUMMARIES_PATH = './model_summaries/J5_L8/ScatNet_Shallow/'
+WEIGHTS_PATH = './weights/J2_L8_44/ScatNet_Deep/'
+SUMMARIES_PATH = './model_summaries/J2_L8_44/ScatNet_Deep/'
 DEVICE = 'cuda'
 TRAIN_SUBJECT_IDS = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28, 31, 34, 35, 38]
 TEST_SUBJECT_IDS = [3, 6, 7, 10, 11, 12, 20, 21, 22, 23, 24, 26, 29, 30, 32, 33, 38, 37, 39, 40]
@@ -25,8 +25,9 @@ def input_size(J, L):
     return int(n)
 
 
-scattering_dir = 'C:/Local/scattering_coeffs_J5/'
+scattering_dir = 'C:/Local/scattering coeffs_J2_single_scale/' # note, the J2 files are not single scale
 in_size_J4_L8 = input_size(4, 8)
+in_size_J2_L8_44 = input_size(2,8) * 4*4
 in_size_J5_L8 = input_size(5, 8)
 
 # create the scattering datasets with varying test sample sizes
@@ -52,14 +53,14 @@ scattering_testloader = DataLoader(scattering_test, batch_size = BATCH_SIZE, shu
 print('Training Scattering Models:')
 # ============  Scattering =====================
 
-layers = [256, 512, 'D']
+layers = [512, 1024, 1024, 512, 256, 'D']
 
 # === 2 Subjects ===
 
-ScatNet = ScatteringModel(in_size_J5_L8, layers).to(DEVICE)
+ScatNet = ScatteringModel(in_size_J2_L8_44, layers).to(DEVICE)
 weights_file = 'scattering_2_subs.pth'
 summary_file = 'scattering_2_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_2_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
@@ -72,10 +73,10 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 
 # === 5 Subjects ===
 
-ScatNet = ScatteringModel(in_size_J5_L8, layers).to(DEVICE)
+ScatNet = ScatteringModel(in_size_J2_L8_44, layers).to(DEVICE)
 weights_file = 'scattering_5_subs.pth'
 summary_file = 'scattering_5_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_5_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
@@ -86,10 +87,10 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 
 # === 12 Subjects ===
 
-ScatNet = ScatteringModel(in_size_J5_L8, layers).to(DEVICE)
+ScatNet = ScatteringModel(in_size_J2_L8_44, layers).to(DEVICE)
 weights_file = 'scattering_12_subs.pth'
 summary_file = 'scattering_12_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_12_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
@@ -100,10 +101,10 @@ ScatNet_class.save_model_summary(SUMMARIES_PATH + summary_file)
 
 # === All Subjects ===
 
-ScatNet = ScatteringModel(in_size_J5_L8, layers).to(DEVICE)
+ScatNet = ScatteringModel(in_size_J2_L8_44, layers).to(DEVICE)
 weights_file = 'scattering_all_subs.pth'
 summary_file = 'scattering_all_subs.json'
-optimiser = optim.Adam(ScatNet.parameters(), lr = 0.01)
+optimiser = optim.Adam(ScatNet.parameters(), lr = 0.001)
 scheduler = optim.lr_scheduler.StepLR(optimiser, gamma = 0.2, step_size = 25)
 ScatNet_class = runModel(ScatNet, DEVICE, optimiser, loss_fn, scattering_trainloader_all_subs, scattering_testloader, scheduler)
 ScatNet_class.train(epochs = 100, validate = True)
