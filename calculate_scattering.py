@@ -191,8 +191,7 @@ def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8
             f = file[:-4]
             if f + '.pth' in already_calc:
                 # print(f'{f} already exists!')
-                # continue
-                pass
+                continue
 
             path = os.path.join(image_dir, file) # path to the image itself
             image = Image.open(path).convert("RGB") # read in the image and convert to RGB to ensure 3 channels
@@ -216,7 +215,7 @@ def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8
 
 
                 # calculate coeffs --> global pooling --> remove extra dims --> flatten --> move back to cpu to free up space
-                coeffs_large = S_large(stack_large).view(-1,K,8,8).cpu()
+                coeffs_large = Pool(combine_dims(S_large(stack_large))).cpu()
 
 
 
@@ -238,6 +237,6 @@ if __name__ == '__main__':
     # image_dir = 'C:/Local/transformed_images/'
     image_dir = './data/NTU_RGB+D/transformed_images/'
     # save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled/'
-    save_dir = './data/NTU_RGB+D/scattering coeffs_J2_single_scale/'
-    # preprocessScatteringCoeffs_NotPooled(image_dir, save_dir, J = 4, batch_size = 128)
-    preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J = 2, pool = 4, batch_size = 128)
+    save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled_J2_88/'
+    preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 2, batch_size = 128, shape = (64,64))
+    # preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J = 2, pool = 4, batch_size = 128)
