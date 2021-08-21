@@ -11,7 +11,7 @@ def combine_dims(x, dim_begin = 1, dim_end=3):
     combined_shape = list(x.shape[:dim_begin]) + [-1] + list(x.shape[dim_end:])
     return x.view(combined_shape)
 
-def preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J, L= 8, batch_size = 64, pool = 1, large = (128,128), med = (64,64), small = (40,40)):
+def preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J, L= 8, batch_size = 64, pool = 1, large = (128,128), med = (64,64), small = (40,40), msr = False):
     """
     Calculates the pooled and flattened scattering coefficients for all images in a directory
 
@@ -79,7 +79,7 @@ def preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J, L= 8, batch_size =
         f = file[:-4]
         if f + '.pth' in already_calc:
             # print(f'{f} already exists!')
-            continue
+            pass
 
         path = os.path.join(image_dir, file) # path to the image itself
         image = Image.open(path).convert("RGB") # read in the image and convert to RGB to ensure 3 channels
@@ -117,7 +117,10 @@ def preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J, L= 8, batch_size =
             for j, name in enumerate(in_stack):
                 # target value has -1 so the classes start at 0 rather than 1, better for pytorch networks to handle
                 # scattering_dict[in_stack[j]] = (coeffs_large[j], coeffs_med[j], coeffs_small[j], int(name[-3:])-1) # add the flattend coeffs and target to the dictionary with the key as the file name without the extension
-                torch.save((coeffs_large[j].type(torch.float16), coeffs_med[j].type(torch.float16), coeffs_small[j].type(torch.float16), int(name[-3:])-1), save_dir + name + '.pth')
+                if not msr:
+                    torch.save((coeffs_large[j].type(torch.float16), coeffs_med[j].type(torch.float16), coeffs_small[j].type(torch.float16), int(name[-3:])-1), save_dir + name + '.pth')
+                else:
+                    torch.save((coeffs_large[j].type(torch.float16), coeffs_med[j].type(torch.float16), coeffs_small[j].type(torch.float16), int(name[1:3])-1), save_dir + name + '.pth')
                 # torch.save((coeffs_large[j].type(torch.float64), coeffs_med[j].type(torch.float64), coeffs_small[j].type(torch.float64), int(name[-3:])-1), save_dir + name + '.pth')
                 # torch.save((coeffs_med[j].type(torch.float16), int(name[-3:])-1), save_dir + name + '.pth')
 
@@ -132,7 +135,7 @@ def preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J, L= 8, batch_size =
     # return scattering_dict
 
 
-def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8, batch_size = 128, shape = (128,128)):
+def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8, pool = 8, batch_size = 128, shape = (128,128), msr = False):
         """
         Calculates the scattering coefficients for all images in a directory
 
@@ -191,7 +194,7 @@ def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8
             f = file[:-4]
             if f + '.pth' in already_calc:
                 # print(f'{f} already exists!')
-                continue
+                pass
 
             path = os.path.join(image_dir, file) # path to the image itself
             image = Image.open(path).convert("RGB") # read in the image and convert to RGB to ensure 3 channels
@@ -223,7 +226,10 @@ def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8
                     # target value has -1 so the classes start at 0 rather than 1, better for pytorch networks to handle
                     # scattering_dict[in_stack[j]] = (coeffs_large[j], coeffs_med[j], coeffs_small[j], int(name[-3:])-1) # add the flattend coeffs and target to the dictionary with the key as the file name without the extension
                     # torch.save((coeffs_large[j].type(torch.float16), coeffs_med[j].type(torch.float16), coeffs_small[j].type(torch.float16), int(name[-3:])-1), save_dir[0] + name + '.pth')
-                    torch.save((coeffs_large[j].type(torch.float16), int(name[-3:])-1), save_dir + name + '.pth')
+                    if not msr:
+                        torch.save((coeffs_large[j].type(torch.float16), int(name[-3:])-1), save_dir + name + '.pth')
+                    else:
+                        torch.save((coeffs_large[j].type(torch.float16), int(name[1:3])-1), save_dir + name + '.pth')
                 # reset the stacks and lists
                 in_stack = list()
                 stack_large = torch.Tensor()
@@ -235,8 +241,23 @@ def preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 4, L = 8
 
 if __name__ == '__main__':
     # image_dir = 'C:/Local/transformed_images/'
-    image_dir = './data/NTU_RGB+D/transformed_images/'
-    # save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled/'
-    save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled_J2_88/'
-    preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 2, batch_size = 128, shape = (64,64))
+    # image_dir = './data/NTU_RGB+D/transformed_images/'
+    # # save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled/'
+    # save_dir = './data/NTU_RGB+D/scattering_coeffs_not_pooled_J2_88/'
+    # preprocessScatteringCoeffs_NotGlobalPooled(image_dir, save_dir, J = 2, batch_size = 128, shape = (64,64))
     # preprocessScatteringCoeffs_Pooled(image_dir, save_dir, J = 2, pool = 4, batch_size = 128)
+
+
+    msr_image_dir = './data/MSR_Action3D/inputs/images/'
+
+    save = './data/MSR_Action3D/inputs/scattering_coeffs_J4_L8_mlp/'
+    # preprocessScatteringCoeffs_Pooled(msr_image_dir, save, J = 4, pool = 2, batch_size = 128, msr = True)
+
+    save = './data/MSR_Action3D/inputs/scattering_coeffs_J2_L8_mlp/'
+    # preprocessScatteringCoeffs_Pooled(msr_image_dir, save, J = 2, pool = 6, batch_size = 128, msr = True)
+
+    save = './data/MSR_Action3D/inputs/scattering_coeffs_J4_L8_hybrid/'
+    # preprocessScatteringCoeffs_NotGlobalPooled(msr_image_dir, save, J = 4, batch_size = 128, msr = True)
+
+    save = './data/MSR_Action3D/inputs/scattering_coeffs_J2_L8_hybrid/'
+    preprocessScatteringCoeffs_NotGlobalPooled(msr_image_dir, save, J = 2, batch_size = 128, shape = (64, 64), msr = True, pool = 16)

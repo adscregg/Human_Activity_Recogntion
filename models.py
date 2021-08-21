@@ -135,10 +135,11 @@ class ScatteringModel(Module):
 
 
 class ScatNetCNNHybrid(Module):
-    def __init__(self, J=4, L=8, shape = (128,128)):
+    def __init__(self, J=4, L=8, shape = (128,128), n_classes = 60):
         super().__init__()
         self.J = J
         self.L = L
+        self.n_classes = n_classes
 
         self.scattering = Scattering2D(J=J, L=L, shape = shape)
 
@@ -154,7 +155,7 @@ class ScatNetCNNHybrid(Module):
 
         self.convs = Sequential(*self.convs)
 
-        self.fc = Linear(1024, 60)
+        self.fc = Linear(1024, n_classes)
 
 
     def forward(self, x):

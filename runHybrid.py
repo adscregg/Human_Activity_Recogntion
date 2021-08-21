@@ -182,7 +182,7 @@ class runModel:
         self.test_loss = 0
         n_correct = 0
         # progress = tqdm(self.test_loader, desc = 'Testing', leave=False, position = 0)
-        self.confusion_matrix = torch.zeros(60, 60)
+        self.confusion_matrix = torch.zeros(self.model.n_classes, self.model.n_classes)
         with torch.no_grad(): # let PyTorch know that no gradient information is needed as no training is being done, faster evaluation
             for value, target in self.test_loader:
                 value, target = value.to(self.device), target.to(self.device)

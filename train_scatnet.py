@@ -12,8 +12,8 @@ from run import runModel
 # ============================ SETUP ===============================================================
 
 BATCH_SIZE = 128
-WEIGHTS_PATH = './weights/J2_L8_44/ScatNet_Deep/'
-SUMMARIES_PATH = './model_summaries/J2_L8_44/ScatNet_Deep/'
+WEIGHTS_PATH = './weights/NTU-RGB+D/J2_L8_44/ScatNet_Deep/'
+SUMMARIES_PATH = './model_summaries/NTU-RGB+D/J2_L8_44/ScatNet_Deep/'
 DEVICE = 'cuda'
 TRAIN_SUBJECT_IDS = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28, 31, 34, 35, 38]
 TEST_SUBJECT_IDS = [3, 6, 7, 10, 11, 12, 20, 21, 22, 23, 24, 26, 29, 30, 32, 33, 38, 37, 39, 40]

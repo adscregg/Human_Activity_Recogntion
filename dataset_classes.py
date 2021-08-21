@@ -6,7 +6,7 @@ from PIL import Image
 import torch
 
 class scatteringDataset(Dataset):
-    def __init__(self, scattering_dir = None, subjects = None, multi = True):
+    def __init__(self, scattering_dir = None, subjects = None, multi = True, msr = False):
         """
         Dataset class for scattering coefficients stored in a dictionary
 
@@ -25,10 +25,17 @@ class scatteringDataset(Dataset):
             raise ValueError('Please provide a file path to the flattened and pooling scattering coeffs')
         if subjects is None:
             warnings.warn('No value is specified for the subjects to be used, all subjects are being used by default')
-            subjects = list(range(1,41)) # 40 subjects in the NTu RGB+D dataset
+
+            if not msr:
+                subjects = list(range(1,41)) # 40 subjects in the NTu RGB+D dataset
+            else:
+                subjects = list(range(1,11))
 
         self.scattering_dir = scattering_dir
-        self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject id to filter the dict keys by
+        if not msr:
+            self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject id to filter the dict keys by
+        else:
+            self.subjects = ['s' + f"{a:02}" for a in subjects]
         self.samples = [] # empty list, will contain samples to be accepted into the dataset
 
         # for k, v in self.scattering_dir.items(): # loop over the key, value pairs
@@ -36,8 +43,12 @@ class scatteringDataset(Dataset):
         #         self.samples.append(v) # add sample to accepted samples of the dataset
 
         for file in set(os.listdir(self.scattering_dir)).difference({'Thumbs.db'}): # remove the Thumbs.db file if present
-            if file[8:12] in self.subjects: # if the participant string is in the file name
-                self.samples.append(file)
+            if not msr:
+                if file[8:12] in self.subjects: # if the participant string is in the file name
+                    self.samples.append(file)
+            else:
+                if file[4:7] in self.subjects: # if the participant string is in the file name
+                    self.samples.append(file)
 
     def __len__(self):
         return len(self.samples) # number of samples
@@ -60,7 +71,7 @@ class scatteringDataset(Dataset):
 
 
 class imageDataset(Dataset):
-    def __init__(self, image_dir = None, subjects = None, large = (128,128), med = (64,64), small = (40,40)):
+    def __init__(self, image_dir = None, subjects = None, large = (128,128), med = (64,64), small = (40,40), msr = False):
         """
         Dataset class for a directory of images
 
@@ -82,13 +93,16 @@ class imageDataset(Dataset):
             see `large`. Defaults to (40, 40)
 
         """
-
+        self.msr = msr
         # check if arguments have been passed and throw relevant error/warning
         if image_dir is None:
             raise ValueError('Please provide the directory of the images')
         if subjects is None:
             warnings.warn('No value is specified for the subjects to be used, all subjects are being used by default')
-            subjects = list(range(1,41)) # 40 subjects in the NTU RGB+D dataset
+            if not msr:
+                subjects = list(range(1,41)) # 40 subjects in the NTU RGB+D dataset
+            else:
+                subjects = list(range(1,11))
 
 
         self.image_dir = image_dir
@@ -99,9 +113,15 @@ class imageDataset(Dataset):
 
 
 
-        self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject ids to filter the file names by
+        if not msr:
+            self.subjects = ['P' + f"{a:03}" for a in subjects] # string form of the subject id to filter the dict keys by
+        else:
+            self.subjects = ['s' + f"{a:02}" for a in subjects]
 
-        self.accepted_files = [file for file in self.all_files if file[8:12] in self.subjects] # file names that are accepted as part of the dataset
+        if not msr:
+            self.accepted_files = [file for file in self.all_files if file[8:12] in self.subjects] # file names that are accepted as part of the dataset
+        else:
+            self.accepted_files = [file for file in self.all_files if file[4:7] in self.subjects]
 
         # Define transformation that will resize the images to (N, M) and convert them to torch.Tensor objects
         self.trans_large = T.Compose([T.Resize(self.large), T.ToTensor()])
@@ -120,7 +140,9 @@ class imageDataset(Dataset):
         im_large = self.trans_large(image)
         im_med = self.trans_med(image)
         im_small = self.trans_small(image)
-
-        target = int(file_name[17:20])-1 # target id, has -1 so the class ids start at 0, easy for pytorch to handle
+        if not self.msr:
+            target = int(file_name[17:20])-1 # target id, has -1 so the class ids start at 0, easy for pytorch to handle
+        else:
+            target = int(file_name[1:3])-1
 
         return im_large, im_med, im_small, target
