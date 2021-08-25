@@ -170,39 +170,66 @@ def _create_action_array(d):
 
     return action_array
 
+def Parse_MSRAction3D(filepath, save_loc):
+    order = [0,7,9,11, 1,8,10,12, 6,3,2,19, 5,14,16,18, 4,13,15,17]
+    files = os.listdir(filepath)
+    for file in files:
+        fp = os.path.join(filepath, file)
+        try:
+            skel = np.loadtxt(fp)
+        except:
+            print(file)
+            continue
+        length = len(skel)
+        skel = skel.reshape((length, 4), order='F')
+        skel = skel.reshape((20, -1, 4), order='F')
+        X = skel[:, :, 0]
+        Y = skel[:, :, 2]/4
+        Z = 400 - skel[:, :, 1]
+
+        skel = np.stack([X, Y, Z], axis=-1)
+        skel = skel[order, :,:]
+
+        im = _translation_scale_invariant(skel)
+        image = Image.fromarray(im)
+        image.save(save_loc + f'{file[:-4]}.jpg')
+
 
 if __name__ == '__main__':
-    missing_files = _load_missing_file(missing_file_path)
-    datalist = os.listdir(load_txt_path)
-    alread_exist = os.listdir(save_npy_path)
-    alread_exist_dict = dict(zip(alread_exist, len(alread_exist) * [True]))
-
-
-    for each in tqdm(datalist):
-        # _print_toolbar(ind * 1.0 / len(datalist),
-        #                '({:>5}/{:<5})'.format(
-        #                    ind + 1, len(datalist)
-        #                ))
-        S = int(each[1:4])
-        if S not in step_ranges:
-            continue
-        if each[:20]+'.jpg' in alread_exist_dict:
-            # print('file already existed!')
-            continue
-        if each[:20] in missing_files:
-            print(f'{each[:20]} file missing')
-            continue
-        loadname = load_txt_path+each
-        mat = _read_skeleton(loadname)
-        arr = np.array(mat).item(0)
-
-        array = _create_action_array(arr)
-        image_array = _translation_scale_invariant(array)
-        image = Image.fromarray(image_array)
-
-
-        save_path = save_npy_path+'{}.jpg'.format(each[:-9])
-        image.save(save_path)
+    fp = './data/MSR_Action3D/MSRAction3DSkeleton(20joints)/'
+    save_loc = './data/MSR_Action3D/inputs/images/'
+    Parse_MSRAction3D(fp, save_loc)
+    # missing_files = _load_missing_file(missing_file_path)
+    # datalist = os.listdir(load_txt_path)
+    # alread_exist = os.listdir(save_npy_path)
+    # alread_exist_dict = dict(zip(alread_exist, len(alread_exist) * [True]))
+    #
+    #
+    # for each in tqdm(datalist):
+    #     # _print_toolbar(ind * 1.0 / len(datalist),
+    #     #                '({:>5}/{:<5})'.format(
+    #     #                    ind + 1, len(datalist)
+    #     #                ))
+    #     S = int(each[1:4])
+    #     if S not in step_ranges:
+    #         continue
+    #     if each[:20]+'.jpg' in alread_exist_dict:
+    #         # print('file already existed!')
+    #         continue
+    #     if each[:20] in missing_files:
+    #         print(f'{each[:20]} file missing')
+    #         continue
+    #     loadname = load_txt_path+each
+    #     mat = _read_skeleton(loadname)
+    #     arr = np.array(mat).item(0)
+    #
+    #     array = _create_action_array(arr)
+    #     image_array = _translation_scale_invariant(array)
+    #     image = Image.fromarray(image_array)
+    #
+    #
+    #     save_path = save_npy_path+'{}.jpg'.format(each[:-9])
+    #     image.save(save_path)
         # if ind == 5:
         #     break
         # raise ValueError()
